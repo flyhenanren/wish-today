@@ -2,8 +2,9 @@
 </script>
 
 <template>
-  <span>Memory</span>
+  <span>Thread</span>
 </template>
 
 <style scoped>
+
 </style>

@@ -1,7 +1,8 @@
 import { createApp } from 'vue'
-import naive from 'naive-ui'
+import ViewUIPlus from 'view-ui-plus'
 import router from './router'
 import App from './App.vue'
+import 'view-ui-plus/dist/styles/viewuiplus.css'
 
 
 import './ipc/ipc'
@@ -10,7 +11,7 @@ import './ipc/ipc'
 
 createApp(App)
   .use(router)
-  .use(naive)
+  .use(ViewUIPlus)
   .mount('#app')
   .$nextTick(() => {
     postMessage({ payload: 'removeLoading' }, '*')

@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <span>Memory</span>
+  <span>Summary</span>
 </template>
 
 <style scoped>

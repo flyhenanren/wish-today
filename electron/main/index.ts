@@ -6,7 +6,7 @@ import os from 'node:os'
 
 
 
-import {rsNativeSum, rsNativeSubtraction} from '../../native'
+import {rsNativeSum, rsNativeSubtraction} from '../../core'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -70,7 +70,7 @@ async function createWindow() {
   if (VITE_DEV_SERVER_URL) { // #298
     win.loadURL(VITE_DEV_SERVER_URL)
     // Open devTool if the app is not packaged
-    // win.webContents.openDevTools()
+    win.webContents.openDevTools()
   } else {
     win.loadFile(indexHtml)
   }
@@ -144,7 +144,7 @@ function setMenu(){
   //创建菜单集合
   let template = [
       {
-          label: '文件(F)',
+          label: '文件',
           submenu: [
               {
                   label: '打开文件',
@@ -187,6 +187,58 @@ function setMenu(){
                 }
             }
           ]
+      },
+      {
+        label: '视图',
+        submenu: [
+            {
+                label: 'CPU',
+                click: () => {
+                   
+                }
+            },
+            {
+              label: '线程',
+              click: () => {
+                 
+              }
+            },
+            {
+              label: '内存',
+              click: () => {
+                
+              }
+          },
+          {
+            label: '总结',
+            click: () => {
+              
+            }
+        },
+        ]
+      },
+      {
+        label: 'CPU',
+        submenu: [
+            {
+                label: '更多',
+                click: () => {
+                   
+                }
+            }
+        ]
+      },
+      ,
+      {
+        label: 'Memory',
+        submenu: [
+            {
+                label: '更多',
+                click: () => {
+                   
+                }
+            }
+        ]
       },
       {
           label: '帮助(H)',

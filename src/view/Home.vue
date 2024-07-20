@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <span>Memory</span>
+  <span>首页</span>
 </template>
 
 <style scoped>
