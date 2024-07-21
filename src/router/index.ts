@@ -2,6 +2,12 @@ import { createMemoryHistory, createRouter } from 'vue-router'
 
 import CpuView from '../components/cpu'
 import CpuProfiling from '../components/cpu/CpuProfiling.vue'
+import AllThreads from '../components/cpu/AllThreads.vue'
+import ByThreads from '../components/cpu/ByThreads.vue'
+import FlameGraph from '../components/cpu/FlameGraph.vue'
+import HotSpots from '../components/cpu/HotSpots.vue'
+import MethodsList from '../components/cpu/MethodsList.vue'
+
 import ThreadView from '../components/threads'
 import MemoryView from '../components/memory'
 import SummaryView from '../components/summary'
@@ -17,7 +23,12 @@ const routes = [
     name: 'cpu', 
     component: CpuView ,
     children:[
-      { path: '/cpuProfiling', name: 'cpuProfiling',  component: CpuProfiling }
+      { path: '/cpuProfiling', name: 'cpuProfiling',  component: CpuProfiling },
+      { path: '/allThreads', name: 'allThreads',  component: AllThreads},
+      { path: '/byThreads', name: 'byThreads',  component: ByThreads },
+      { path: '/flameGraph', name: 'flameGraph',  component: FlameGraph },
+      { path: '/hotSpots', name: 'hotSpots',  component: HotSpots },
+      { path: '/methodsList', name: 'methodsList',  component: MethodsList }
     ]},
   { path: '/thread', name:'thread',component: ThreadView },
   { path: '/memory', name:'memory',component: MemoryView },

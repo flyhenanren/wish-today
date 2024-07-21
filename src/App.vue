@@ -40,7 +40,7 @@ function handleClickTab(name: string) {
 
 <template>
   <div>
-    <Tabs type="card" size="small" closable  draggable
+    <Tabs type="card"  closable  draggable
     v-model="currentSheet"
     @on-tab-remove="handleTabRemove"
     @on-click="handleClickTab">

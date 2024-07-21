@@ -1,43 +1,81 @@
 <script setup lang="ts">
 import {ref,onMounted,onUnmounted,nextTick} from 'vue'
+import {MergedCallee} from '../stackTrace'
 import * as echarts from 'echarts';
+import useData from './hooks/useData';
 
 const split= ref(0.4)
 const splitMin = ref('100px')
 const splitMax = ref('300px')
 
-const chartDom = ref(null);
-let chartInstance:any = null;
-// 初始化ECharts实例并设置配置项（这里以折线图为例，但可灵活替换）
+const cpuChart = ref(null);
+let cpuGraph:any = null;
+
+const threadsChart = ref(null);
+let threadsGraph:any = null;
+
 onMounted(() => {
-  nextTick(()=>{
-    chartInstance = echarts.init(chartDom.value);
-    const option = {
-      // 这里是ECharts的配置项，可以根据需要绘制不同类型的图表
+  nextTick(()=> {
+    cpuGraph = echarts.init(cpuChart.value)
+    const {cpuData, threadData, xAxis} = useData()
+    const cpuOption = {
       title: {
-        text: 'ECharts '
+        text: 'CPU Usage'
       },
-      tooltip: {},
+      dataZoom:{
+        type:'slider'
+      },
+      tooltip: {
+        trigger: 'axis'
+      },
       xAxis: {
-        data: ["类别1", "类别2", "类别3", "类别4", "类别5"]
+        type: 'category',
+        boundaryGap: false,
+        data: xAxis
       },
-      yAxis: {},
-      series: [{
-        name: '数据系列',
-        type: 'line', // 这里可以是'line'、'bar'、'pie'等，根据图表类型选择
-        data: [120, 200, 150, 80, 70]
-      }]
-    };
-    chartInstance.setOption(option);
+      yAxis: {
+        type: 'value'
+      },
+      series: cpuData
+    }
+    cpuGraph.setOption(cpuOption);
+
+
+    threadsGraph = echarts.init(threadsChart.value)
+    const threadsOption = {
+      title: {
+        text: 'Threads'
+      },
+      dataZoom:{
+        type:'slider'
+      },
+      tooltip: {
+        trigger: 'axis'
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: xAxis
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: threadData
+    }
+    threadsGraph.setOption(threadsOption);
   })
-});
+})
 
 // 销毁ECharts实例
 onUnmounted(() => {
-  if (chartInstance != null && chartInstance.dispose) {
-    chartInstance.dispose();
+  if (cpuGraph != null && cpuGraph.dispose) {
+    cpuGraph.dispose();
   }
-});
+
+  if (threadsGraph != null && threadsGraph.dispose) {
+    threadsGraph.dispose();
+  }
+})
 
 </script>
 
@@ -45,12 +83,14 @@ onUnmounted(() => {
   <div :class="$style.container">
     <Split v-model="split" mode="vertical" :min="splitMin" :max="splitMax">
             <template #top>
-                <div>
-                  <div ref="chartDom" style="width: 300px; height: 400px;"></div>
+                <div style="display: flex;justify-content: space-between;">
+                  <div ref="cpuChart" style="width: 500px; height: 250px;"></div>
+                  <div ref="threadsChart" style="width: 500px; height: 250px;"></div>
                 </div>
             </template>
             <template #bottom>
-                <div class="demo-split-pane">
+                <div >
+                  <MergedCallee/>
                 </div>
             </template>
         </Split>

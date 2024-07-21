@@ -7,3 +7,11 @@ export interface Sheet{
     show: boolean
     icon?: string
 }
+
+export interface StackTrace {
+    id: string;
+    name: string;
+    value: number;
+    children?: [StackTrace];
+  }
+  
