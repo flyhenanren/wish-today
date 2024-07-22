@@ -6,7 +6,7 @@ import os from 'node:os'
 
 
 
-import {rsNativeSum, rsNativeSubtraction} from '../../core'
+// import {rsNativeSum, rsNativeSubtraction} from '../../core'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -78,12 +78,12 @@ async function createWindow() {
   // Test actively push message to the Electron-Renderer
   win.webContents.on('did-finish-load', () => {
 
-    const sum = rsNativeSum(1,2)
-    const sub = rsNativeSubtraction(3,1)
+    // const sum = rsNativeSum(1,2)
+    // const sub = rsNativeSubtraction(3,1)
     
     win?.webContents.send('main-process-message', new Date().toLocaleString())
-    win?.webContents.send('main-process-message-sum', sum)
-    win?.webContents.send('main-process-message-sub', sub)
+    // win?.webContents.send('main-process-message-sum', sum)
+    // win?.webContents.send('main-process-message-sub', sub)
   })
 
   // Make all links open with the browser, not with the application
