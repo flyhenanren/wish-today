@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import useSheet from './hook/useSheet';
-import { S } from 'vite/dist/node/types.d-aGj9QkWt';
 
 const {sheets} = useSheet()
 
@@ -12,17 +11,6 @@ const router = useRouter()
 const currentSheet = sheets[0].key
 
 router.push({name: sheets[0].route})
-
-// function selectedMenu(key: string, item: MenuOption) {
-//   router.push({
-//     name: item.route as string
-//   })
-// }
-
-// function toHome() {
-//   router.push({ name: 'home' })
-// }
-
 
 
 function handleTabRemove(name) {
