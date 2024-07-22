@@ -34,7 +34,7 @@ function handleClickTab(name: string) {
     @on-tab-remove="handleTabRemove"
     @on-click="handleClickTab">
         <TabPane  v-for ="item in sheets" :name="item.key" :label="item.name" :v-if="item.show">
-          <RouterView   style="width: 100%;height: 100%;"/>
+          <RouterView/>
         </TabPane>
     </Tabs>
   </div>

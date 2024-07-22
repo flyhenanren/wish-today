@@ -5,7 +5,7 @@ import * as echarts from 'echarts';
 import useData from './hooks/useData';
 
 const split= ref(0.4)
-const splitMin = ref('100px')
+const splitMin = ref('300px')
 const splitMax = ref('300px')
 
 const cpuChart = ref(null);
