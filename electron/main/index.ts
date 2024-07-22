@@ -1,8 +1,9 @@
-import { app, BrowserWindow, shell, ipcMain,Menu,dialog } from 'electron'
+import { app, BrowserWindow, shell, ipcMain,Menu,dialog,screen } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import os from 'node:os'
+import { build } from 'vite-plugin-electron'
 
 
 
@@ -92,6 +93,7 @@ async function createWindow() {
     return { action: 'deny' }
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
+  win.maximize()
 }
 
 app.whenReady().then(() => {

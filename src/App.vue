@@ -27,16 +27,22 @@ function handleClickTab(name: string) {
 </script>
 
 <template>
-  <div>
+  <div :class="$style.rootContainer">
     <Tabs type="card"  closable  draggable
+    style="width: 100%;height: 100%;"
     v-model="currentSheet"
     @on-tab-remove="handleTabRemove"
     @on-click="handleClickTab">
         <TabPane  v-for ="item in sheets" :name="item.key" :label="item.name" :v-if="item.show">
-          <RouterView />
+          <RouterView   style="width: 100%;height: 100%;"/>
         </TabPane>
     </Tabs>
   </div>
 </template>
 
-<style scoped module></style>
+<style scoped module>
+.rootContainer{
+  width: 100%;
+  height: 100%;
+}
+</style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, computed} from 'vue'
+import {ref, computed, onMounted, nextTick} from 'vue'
 import useCpuTab from './hooks/useCpuTab';
 import { useRouter, useRoute } from 'vue-router'
 
@@ -26,12 +26,14 @@ const menuitemClasses = computed(()=>{
             isCollapsed.value ? 'collapsed-menu' : ''
         ] 
 }) 
+
+
 </script>
 
 <template>
-   <div class="layout">
+   <div class="layout" ref="layout">
         <Layout>
-            <Sider breakpoint="md" collapsible :collapsed-width="78" v-model="isCollapsed">
+            <Sider breakpoint="md" collapsible :collapsed-width="78" v-model="isCollapsed" >
                 <Menu  theme="dark" width="auto" :class="menuitemClasses"
                   :active-name="currentMenu"
                   @on-select="selectMenu">
@@ -43,7 +45,7 @@ const menuitemClasses = computed(()=>{
                 <template #trigger></template>
             </Sider>
             <Layout>
-                <Content :style="{margin: '20px', background: '#fff', minHeight: '220px',height:'655px'}">
+                <Content class="content" :style="{margin: '20px', background: '#fff', minHeight: '220px', height:'820px' }">
                   <RouterView />
                 </Content>
             </Layout>
@@ -57,7 +59,7 @@ const menuitemClasses = computed(()=>{
         background: #f5f7f9;
         position: relative;
         border-radius: 4px;
-        overflow: hidden;
+        overflow: auto;
     }
     .layout-header-bar{
         background: #fff;
