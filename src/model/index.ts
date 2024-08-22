@@ -8,7 +8,7 @@ export class CommonSheet implements Sheet{
     show: boolean 
     icon?: string
 
-    constructor(key:string, name: string, icon: string, route?: string) {
+    constructor(key:string, name: string, icon?: string, route?: string) {
         this.key = key
         this.name = name
         this.route = route ? route : key

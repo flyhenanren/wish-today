@@ -1,7 +1,7 @@
 // @see https://www.electron.build/configuration/configuration
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "appId": "cn.flyhenanren.wishToday",
   "asar": true,
   "productName": "wishToday",
   "files": [
@@ -9,12 +9,12 @@
     "dist-electron"
   ],
    directories: {
-    output: 'release/${version}', // 打包输出目录
-    buildResources: 'lib', // 构建资源目录
+    output: 'release/${version}', // 打包输出目录的路径模板。${version} 会被替换为应用程序的版本号
+    buildResources: 'lib', // 构建资源的目录路径。打包工具会从这里提取额外资源，如图标、许可证文件等。
   },
   extraResources: {
-    from: "lib", // 额外的静态资源目录
-    to: "lib"
+    from: "resources", // 指定要包含的额外静态资源目录的路径。这些资源会被复制到最终打包应用的指定位置。
+    to: "lib" //指定这些资源在最终应用包中的目标路径。
   },
   "mac": {
     "target": [

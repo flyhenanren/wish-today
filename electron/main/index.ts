@@ -7,7 +7,7 @@ import { build } from 'vite-plugin-electron'
 
 
 
-// import {rsNativeSum, rsNativeSubtraction} from '../../core'
+import {startServer} from '../../core/index'
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -94,6 +94,7 @@ async function createWindow() {
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
   win.maximize()
+  // startServer()
 }
 
 app.whenReady().then(() => {
