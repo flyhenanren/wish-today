@@ -31,7 +31,7 @@ const menuitemClasses = computed(()=>{
 </script>
 
 <template>
-   <div class="layout" ref="layout">
+   <div class="cpu-layout" ref="layout">
         <Layout>
             <Sider breakpoint="md" collapsible :collapsed-width="78" v-model="isCollapsed" >
                 <Menu  theme="dark" width="auto" :class="menuitemClasses"
@@ -54,7 +54,7 @@ const menuitemClasses = computed(()=>{
 </template>
 
 <style scoped>
-.layout{
+.cpu-layout{
         border: 1px solid #d7dde4;
         background: #f5f7f9;
         position: relative;

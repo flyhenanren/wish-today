@@ -1,158 +1,94 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { DataTableColumns } from 'naive-ui'
+import {ref, computed, onMounted, nextTick} from 'vue'
+import useThread from './hooks/useThread';
+import { useRouter, useRoute } from 'vue-router'
 
-const split = ref(0.5)
-const splitMin = ref('100px')
-const splitMax = ref('300px')
+const {tabs} = useThread() 
 
+const router = useRouter()
 
+const currentMenu = ref(tabs[0].key)
+router.push(tabs[0].route)
 
-interface RowData {
-    fileName: string
-    timeStamp: string
-    alive: string
-    gcCount: number
-    monitorCount: number
+function selectMenu(name:string) {
+  const find = tabs.find(e => e.key === name)
+  if(find) {
+    router.push({name: find.route})
+  }
 }
 
-const data: RowData[] = [
-    {
-      fileName: "threaddump_20240402_102234.txt_1",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-    {
-      fileName: "threaddump_20240402_102234.txt_2",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-    {
-      fileName: "threaddump_20240402_102234.txt_3",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-    {
-      fileName: "threaddump_20240402_102234.txt_4",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-    {
-      fileName: "threaddump_20240402_102234.txt_5",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-    {
-      fileName: "threaddump_20240402_102234.txt_6",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-    {
-      fileName: "threaddump_20240402_102234.txt_7",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-    {
-      fileName: "threaddump_20240402_102234.txt_8",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-    {
-      fileName: "threaddump_20240402_102234.txt_9",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-    {
-      fileName: "threaddump_20240402_102234.txt_10",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-    {
-      fileName: "threaddump_20240402_102234.txt_11",
-      timeStamp: "2024/04/02 10:22:34",
-      alive: "1/22",
-      gcCount: 0,
-      monitorCount: 0
-    },
-   
-]
-const columns: DataTableColumns<RowData> = [
-    {
-        title: '文件名',
-        key: 'fileName'
-    },
-    {
-        title: '时间',
-        key: 'timeStamp'
-    },
-    {
-        title: '执行率',
-        key: 'alive',
-        width: 100
-    },
-    {
-        title: 'GC',
-        key: 'gcCount',
-        width: 40
-    },
-    {
-        title: '阻塞',
-        key: 'monitorCount',
-        width: 60
-    }
-]
 
-const rowKey = (row: RowData) => row.fileName
+const isCollapsed = ref(false)
+
+const menuitemClasses = computed(()=>{  
+  return [
+            'menu-item',
+            isCollapsed.value ? 'collapsed-menu' : ''
+        ] 
+}) 
+
+
 </script>
 
 <template>
-  <div class="demo-split">
-    <Split v-model="split" :min="splitMin" :max="splitMax">
-      <template #left>
-        <div class="demo-split-pane">
-          <n-data-table 
-            virtual-scroll
-            size="small"
-            :max-height="400"
-            :columns="columns" :data="data" :row-key="rowKey" />
-        </div>
-      </template>
-      <template #right>
-        <div class="demo-split-pane">
-          Right Pane
-        </div>
-      </template>
-    </Split>
-  </div>
+   <div class="thread-layout" ref="layout">
+        <Layout>
+            <Sider breakpoint="md" collapsible :collapsed-width="78" v-model="isCollapsed" >
+                <Menu  theme="dark" width="auto" :class="menuitemClasses"
+                  :active-name="currentMenu"
+                  @on-select="selectMenu">
+                    <MenuItem v-for="item in tabs" :name="item.key">
+                        <Icon :type="item.icon" />
+                        <span>{{ item.name }}</span>
+                    </MenuItem>
+                </Menu>
+                <template #trigger></template>
+            </Sider>
+            <Layout>
+                <Content class="content" :style="{margin: '20px', background: '#fff', minHeight: '220px', height:'820px' }">
+                  <RouterView />
+                </Content>
+            </Layout>
+        </Layout>
+    </div>
 </template>
 
 <style scoped>
-.demo-split {
-  height: 600px;
-  border: 1px solid #dcdee2;
-}
-
-.demo-split-pane {
-  padding: 10px;
-}
+.thread-layout{
+        border: 1px solid #d7dde4;
+        background: #f5f7f9;
+        position: relative;
+        border-radius: 4px;
+        overflow: auto;
+    }
+    .layout-header-bar{
+        background: #fff;
+        box-shadow: 0 1px 1px rgba(0,0,0,.1);
+    }
+    .menu-item span{
+        display: inline-block;
+        overflow: hidden;
+        width: 120px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: bottom;
+        transition: width .2s ease .2s;
+    }
+    .menu-item i{
+        transform: translateX(0px);
+        transition: font-size .2s ease, transform .2s ease;
+        vertical-align: middle;
+        font-size: 16px;
+    }
+    .collapsed-menu span{
+        width: 0px;
+        transition: width .2s ease;
+    }
+    .collapsed-menu i{
+        transform: translateX(5px);
+        transition: font-size .2s ease .2s, transform .2s ease .2s;
+        vertical-align: middle;
+        font-size: 22px;
+    }
+    .dev-run-preview .dev-run-preview-edit{ display: none }
 </style>
