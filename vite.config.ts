@@ -62,13 +62,18 @@ export default defineConfig(({ command }) => {
         renderer: {},
       }),
     ],
-    server: process.env.VSCODE_DEBUG && (() => {
-      const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL)
-      return {
-        host: url.hostname,
-        port: +url.port,
+    server: {
+      host:'0.0.0.0',
+      port:5174,
+      proxy:{
+        "/api":{
+          target:"http://localhost:3000",
+          secure:false,
+          changeOrigin:true,  // 允许跨域
+          rewrite:path => path.replace(/^\/api/,'')
+        }
       }
-    })(),
+    },
     css: {
       // 对css的行为进行配置
       // modules配置最终会丢给postcss modules

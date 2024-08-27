@@ -38,5 +38,9 @@
     "vue": "^3.4.21",
     "vue-router": "^4.4.0",
     "vue-tsc": "^2.0.6"
+  },
+  "dependencies": {
+    "@types/axios": "^0.14.0",
+    "axios": "^1.7.5"
   }
 }

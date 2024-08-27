@@ -94,7 +94,7 @@ async function createWindow() {
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
   win.maximize()
-  // startServer()
+  startServer()
 }
 
 app.whenReady().then(() => {
