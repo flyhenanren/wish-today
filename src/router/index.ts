@@ -10,7 +10,6 @@ import MethodsList from '../components/cpu/MethodsList.vue'
 
 import ThreadView from '../components/threads'
 import ThreadCount from '../components/threads/ThreadCount.vue'
-import ThreadPools from '../components/threads/ThreadPools.vue'
 import IdenticalStackTrace from '../components/threads/IdenticalStackTrace.vue'
 import BlockingThreads from '../components/threads/BlockingThreads.vue'
 import DeadLock from '../components/threads/DeadLock.vue'
@@ -39,7 +38,6 @@ const routes = [
   { path: '/thread', name:'thread',component: ThreadView,
     children:[
       { path: '/threadCount', name: 'threadCount',  component: ThreadCount },
-      { path: '/threadPools', name: 'threadPools',  component: ThreadPools },
       { path: '/identicalStackTrace', name: 'identicalStackTrace',  component: IdenticalStackTrace },
       { path: '/blockingThreads', name: 'blockingThreads',  component: BlockingThreads },
       { path: '/deadLock', name: 'deadLock',  component: DeadLock }
