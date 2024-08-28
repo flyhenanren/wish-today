@@ -2,7 +2,6 @@
 import {ref, computed, onMounted, nextTick} from 'vue'
 import useCpuTab from './hooks/useCpuTab';
 import { useRouter, useRoute } from 'vue-router'
-import {useCheck} from '../../api/api'
 const {tabs} = useCpuTab() 
 
 const router = useRouter()
@@ -27,17 +26,10 @@ const menuitemClasses = computed(()=>{
         ] 
 }) 
 
-function testClick(){
-    useCheck().then(resp => {
-        console.log(resp)
-    })
-}
-
 </script>
 
 <template>
    <div class="cpu-layout" ref="layout">
-        <Button @click="testClick">click</Button>
         <Layout>
             <Sider breakpoint="md" collapsible :collapsed-width="78" v-model="isCollapsed" >
                 <Menu  theme="dark" width="auto" :class="menuitemClasses"

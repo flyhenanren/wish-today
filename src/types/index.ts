@@ -16,16 +16,13 @@ export interface StackTrace {
 }
   
 export enum ThreadStatus {
-    NEW,
-    RUNNABLE,
-    "TIMED_WAITING (sleeping)", //SLEEPING
-    "WAITING (on object monitor)",//IN_OBJECT_WAIT
-    "TIMED_WAITING (on object monitor)", //IN_OBJECT_WAIT_TIMED
-    "WAITING (parking)", //PARKED
-    "TIMED_WAITING (parking)", //PARKED_TIMED
-    "BLOCKED (on object monitor)",//BLOCKED_ON_MONITOR_ENTER
-    TERMINATED, //TERMINATED
-    UNKNOWN
+    NEW = "NEW",
+    RUNNABLE = "RUNNABLE",
+    TIMED_WAITING = "TIMED_WAITING",
+    WAITING="WAITING",
+    BLOCKED ="BLOCKED",
+    TERMINATED="TERMINATED", 
+    UNKNOWN="UNKNOWN"
 }
 export interface Thread {
     tid: string

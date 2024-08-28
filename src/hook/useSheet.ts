@@ -11,8 +11,8 @@ export default function() {
     const summarySheet = new CommonSheet('summary','总结')
     const memorySheet = new CommonSheet('memory','内存')
 
-    sheets.push(cpuSheet)
     sheets.push(threadSheet)
+    sheets.push(cpuSheet)
     sheets.push(memorySheet)
     sheets.push(summarySheet)
 
