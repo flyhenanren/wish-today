@@ -2,19 +2,21 @@ import fs from 'node:fs'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron/simple'
+
 import pkg from './package.json'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
   fs.rmSync('dist-electron', { recursive: true, force: true })
-
+  console.log()
   const isServe = command === 'serve'
   const isBuild = command === 'build'
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
-
+  const isElectron = !process.argv.slice(2).includes('--view-model')
   return {
     plugins: [
       vue(),
+      isElectron && 
       electron({
         main: {
           // Shortcut of `build.lib.entry`
@@ -60,11 +62,11 @@ export default defineConfig(({ command }) => {
         // If you want use Node.js in Renderer process, the `nodeIntegration` needs to be enabled in the Main process.
         // See 👉 https://github.com/electron-vite/vite-plugin-electron-renderer
         renderer: {},
-      }),
+      })
     ],
     server: {
       host:'0.0.0.0',
-      port:5174,
+      port:5173,
       proxy:{
         "/api":{
           target:"http://localhost:3000",
