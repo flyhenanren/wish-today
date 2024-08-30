@@ -8,14 +8,15 @@ import pkg from './package.json'
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
   fs.rmSync('dist-electron', { recursive: true, force: true })
-
+  console.log()
   const isServe = command === 'serve'
   const isBuild = command === 'build'
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
-
+  const isElectron = !process.argv.slice(2).includes('--view-model')
   return {
     plugins: [
       vue(),
+      isElectron && 
       electron({
         main: {
           // Shortcut of `build.lib.entry`
@@ -65,7 +66,7 @@ export default defineConfig(({ command }) => {
     ],
     server: {
       host:'0.0.0.0',
-      port:5174,
+      port:5173,
       proxy:{
         "/api":{
           target:"http://localhost:3000",

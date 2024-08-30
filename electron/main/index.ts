@@ -1,48 +1,54 @@
-// electron-main/index.ts
-import { app, BrowserWindow } from "electron";
-import { Window } from "../windows/window"; // 具体方法放在此处
-const isDevelopment: boolean = process.env.NODE_ENV !== "production";
+import {
+  app,
+  BrowserWindow,
+} from "electron";
+import os from "node:os";
+import { window } from "../windows/window";
 
 
-// 创建主窗口
-async function createWindow() {
-  let window = new Window();
-  window.listen(); // 设置监听事件，比如主进程与渲染进程之间的通信事件
-  window.createWindows({ isMainWin: true }); // 创建窗口，默认为主窗口
-  window.createTray(); // 创建系统托盘
+// Disable GPU Acceleration for Windows 7
+if (os.release().startsWith("6.1")) app.disableHardwareAcceleration();
+
+// Set application name for Windows 10+ notifications
+if (process.platform === "win32") app.setAppUserModelId(app.getName());
+
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+  process.exit(0);
 }
 
+let win: BrowserWindow | null = null;
 
-// 关闭所有窗口
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
-});
+async function createWindow() {
+  let wd = new window();
+  wd.listen(); // 设置监听事件，比如主进程与渲染进程之间的通信事件
+  win = wd.createWindows({ isMainWin: true }); // 创建窗口，默认为主窗口
+  // wd.createTray(); // 创建系统托盘
+}
 
-
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
-});
-
-
-// 准备完成，初始化窗口等操作
-app.on("ready", async () => {
+app.whenReady().then(() => {
   createWindow();
 });
 
+app.on("window-all-closed", () => {
+  win = null;
+  if (process.platform !== "darwin") app.quit();
+});
 
-// 根据环境处理不同操作
-if (isDevelopment) {
-  if (process.platform === "win32") {
-    process.on("message", (data) => {
-      if (data === "graceful-exit") {
-        app.quit();
-      }
-    });
-  } else {
-    process.on("SIGTERM", () => {
-      app.quit();
-    });
+// 运行第二个实例。
+app.on("second-instance", () => {
+  if (win) {
+    // Focus on the main window if the user tried to open another
+    if (win.isMinimized()) win.restore();
+    win.focus();
   }
-}
+});
+
+app.on("activate", () => {
+  const allWindows = BrowserWindow.getAllWindows();
+  if (allWindows.length) {
+    allWindows[0].focus();
+  } else {
+    createWindow();
+  }
+});

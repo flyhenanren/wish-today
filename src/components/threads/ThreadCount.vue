@@ -156,15 +156,15 @@ const tableData = ref([])
 
 /** */
 
-import { useIpcRenderer } from "@vueuse/electron";
-const ipcRenderer = useIpcRenderer();
-const openWindow = () => {
-  ipcRenderer.send("window-new", {
-    route: "/helloworld",
-    width: 500,
-    height: 500,
-  });
-};
+// import { useIpcRenderer } from "@vueuse/electron";
+// const ipcRenderer = useIpcRenderer();
+// const openWindow = () => {
+//   ipcRenderer.send("window-new", {
+//     route: "/helloworld",
+//     width: 500,
+//     height: 500,
+//   });
+// };
 
 </script>
 
