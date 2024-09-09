@@ -33,7 +33,7 @@ function handleClickTab(name: string) {
     v-model="currentSheet"
     @on-tab-remove="handleTabRemove"
     @on-click="handleClickTab">
-        <TabPane  v-for ="item in sheets" :name="item.key" :label="item.name" :v-if="item.show">
+        <TabPane v-for ="item in sheets" :name="item.key" :label="item.name" :v-if="item.show">
           <RouterView/>
         </TabPane>
     </Tabs>

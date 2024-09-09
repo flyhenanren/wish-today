@@ -65,7 +65,7 @@ export class window {
       }
     }
     // 创建 electron 窗口的配置参数
-    let opt = this.winOpts([args.width || 390, args.height || 590]);
+    let opt = this.defaultOption([args.width || 390, args.height || 590]);
     // 判断是否有父窗口
     if (args.parentId) {
       console.log("parentId：" + args.parentId);
@@ -80,13 +80,7 @@ export class window {
     if (args.minWidth) opt.minWidth = args.minWidth;
     if (args.minHeight) opt.minHeight = args.minHeight;
 
-    let win: BrowserWindow = new BrowserWindow({
-      title: "Main window",
-      icon: path.join(process.env.VITE_PUBLIC, "favicon.ico"),
-      webPreferences: {
-        preload,
-      },
-    });
+    let win: BrowserWindow = new BrowserWindow(opt);
     console.log("window id:" + win.id);
     this.group[win.id] = {
       route: args.route,
@@ -108,11 +102,11 @@ export class window {
     args.id = win.id;
     win.on("close", () => win.setOpacity(0));
     if (VITE_DEV_SERVER_URL) {
-      win.loadURL(VITE_DEV_SERVER_URL);
+      win.loadURL(`${VITE_DEV_SERVER_URL}#${args.route}`);
       // Open devTool if the app is not packaged
       win.webContents.openDevTools();
     } else {
-      win.loadFile(indexHtml);
+      win.loadFile(indexHtml, { hash: args.route });
     }
 
     // Test actively push message to the Electron-Renderer
@@ -218,7 +212,9 @@ export class window {
     });
 
     // 创建窗口
-    ipcMain.on("window-new", (event: IpcMainEvent, args) => this.createWindows(args));
+    ipcMain.on("window-new", (event: IpcMainEvent, args) => {
+      this.createWindows(args)
+    });
   }
 
   createTray() {
@@ -255,7 +251,7 @@ export class window {
   }
 
   // 窗口配置
-  winOpts(wh: Array<number> = []): IWindowOpt {
+  defaultOption(wh: Array<number> = []): IWindowOpt {
     return {
       width: wh[0],
       height: wh[1],
@@ -265,13 +261,14 @@ export class window {
       minimizable: true,
       maximizable: true,
       frame: true,
+      icon: path.join(process.env.VITE_PUBLIC, "favicon.ico"),
       show: false,
       minWidth: 0,
       minHeight: 0,
       modal: true,
       webPreferences: {
-        contextIsolation: false, //上下文隔离
-        nodeIntegration: true, //启用 Node 集成（是否完整的支持 node）
+        // contextIsolation: false, //上下文隔离
+        // nodeIntegration: true, //启用 Node 集成（是否完整的支持 node）
         webSecurity: false,
         preload: preload,
       },

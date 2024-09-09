@@ -7,7 +7,7 @@ export interface IWindowsCfg {
   width: number | null;
   height: number | null;
   minWidth: number | null;
-  minHeight: number | null; // 
+  minHeight: number | null; //
   route: string; // 路由信息
   resizable: boolean; // 允许缩放
   maximize: boolean; //最大化窗口
@@ -21,6 +21,7 @@ export interface IWindowsCfg {
 export interface IWindowOpt {
   width: number;
   height: number;
+  icon: string;
   backgroundColor: string;
   autoHideMenuBar: boolean;
   resizable: boolean;
@@ -33,8 +34,8 @@ export interface IWindowOpt {
   minHeight: number;
   modal: boolean;
   webPreferences: {
-    contextIsolation: boolean; //上下文隔离
-    nodeIntegration: boolean; //启用 Node 集成（是否完整的支持 node）
+    contextIsolation?: boolean; //上下文隔离
+    nodeIntegration?: boolean; //启用 Node 集成（是否完整的支持 node）
     webSecurity: boolean;
     preload: string;
   };
@@ -49,7 +50,7 @@ export const windowsCfg: IWindowsCfg = {
   height: null, //高度
   minWidth: null, //最小宽度
   minHeight: null, //最小高度
-  route: "", // 页面路由 URL '/manage?id=123'
+  route: null, // 页面路由 URL '/manage?id=123'
   resizable: true, //是否支持调整窗口大小
   maximize: false, //是否最大化
   backgroundColor: "#eee", //窗口背景色

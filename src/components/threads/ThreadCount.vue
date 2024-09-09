@@ -4,6 +4,7 @@ import { ThreadCount } from "./types";
 import { ThreadStatus } from "../../types";
 import * as echarts from 'echarts';
 import useColor from "./hooks/useColor";
+import useIpc from "../../ipc/useIpc"
 
 const { getBackground, getForeground } = useColor()
 
@@ -154,17 +155,11 @@ const tableColumns = ref([
 const tableData = ref([])
 
 
-/** */
 
-// import { useIpcRenderer } from "@vueuse/electron";
-// const ipcRenderer = useIpcRenderer();
-// const openWindow = () => {
-//   ipcRenderer.send("window-new", {
-//     route: "/helloworld",
-//     width: 500,
-//     height: 500,
-//   });
-// };
+const {createWindow} = useIpc();
+function openWindow(status: ThreadStatus) {
+    createWindow({ isMainWin: false, route: '/error'})
+};
 
 </script>
 
@@ -183,7 +178,7 @@ const tableData = ref([])
             <div :class="[$style.threadNum, $style.textCenter]">{{ item.count }}</div>
             <div :class="[$style.threadStatus, $style.textCenter]">{{ item.status }}</div>
             <div :class="[$style.theadDetail, $style.textCenter, $style.panelNewFooter]" :style="getStyle(item.status)">
-              <span @click="openWindow">ViewDetail</span>
+              <span @click="() => openWindow(item.status)">ViewDetail</span>
             </div>
           </div>
         </div>
