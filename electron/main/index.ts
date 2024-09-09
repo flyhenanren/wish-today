@@ -22,7 +22,7 @@ let win: BrowserWindow | null = null;
 async function createWindow() {
   let wd = new window();
   wd.listen(); // 设置监听事件，比如主进程与渲染进程之间的通信事件
-  win = wd.createWindows({ isMainWin: true }); // 创建窗口，默认为主窗口
+  win = wd.createWindows({ isMainWin: true}); // 创建窗口，默认为主窗口
   // wd.createTray(); // 创建系统托盘
 }
 

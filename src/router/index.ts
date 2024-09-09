@@ -19,32 +19,39 @@ import SummaryView from '../components/summary'
 import ErrorView from '../view/Error.vue'
 import AboutView from '../view/About.vue'
 import HomeView from '../view/Home.vue'
+import ThreadDetail from '../view/ThreadDetail.vue'
 
 
 const routes = [
-  { path: '/', name:'home',component: HomeView },
-  { 
-    path: '/cpu',
-    name: 'cpu', 
-    component: CpuView ,
+  { path: '/', 
+    name:'home',
+    component: HomeView,
     children:[
-      { path: '/cpuProfiling', name: 'cpuProfiling',  component: CpuProfiling },
-      { path: '/allThreads', name: 'allThreads',  component: AllThreads},
-      { path: '/byThreads', name: 'byThreads',  component: ByThreads },
-      { path: '/flameGraph', name: 'flameGraph',  component: FlameGraph },
-      { path: '/hotSpots', name: 'hotSpots',  component: HotSpots },
-      { path: '/methodsList', name: 'methodsList',  component: MethodsList }
-    ]},
-  { path: '/thread', name:'thread',component: ThreadView,
-    children:[
-      { path: '/threadCount', name: 'threadCount',  component: ThreadCount },
-      { path: '/identicalStackTrace', name: 'identicalStackTrace',  component: IdenticalStackTrace },
-      { path: '/blockingThreads', name: 'blockingThreads',  component: BlockingThreads },
-      { path: '/deadLock', name: 'deadLock',  component: DeadLock }
+      { 
+        path: '/cpu',
+        name: 'cpu', 
+        component: CpuView ,
+        children:[
+          { path: '/cpuProfiling', name: 'cpuProfiling',  component: CpuProfiling },
+          { path: '/allThreads', name: 'allThreads',  component: AllThreads},
+          { path: '/byThreads', name: 'byThreads',  component: ByThreads },
+          { path: '/flameGraph', name: 'flameGraph',  component: FlameGraph },
+          { path: '/hotSpots', name: 'hotSpots',  component: HotSpots },
+          { path: '/methodsList', name: 'methodsList',  component: MethodsList }
+        ]},
+      { path: '/thread', name:'thread',component: ThreadView,
+        children:[
+          { path: '/threadCount', name: 'threadCount',  component: ThreadCount },
+          { path: '/identicalStackTrace', name: 'identicalStackTrace',  component: IdenticalStackTrace },
+          { path: '/blockingThreads', name: 'blockingThreads',  component: BlockingThreads },
+          { path: '/deadLock', name: 'deadLock',  component: DeadLock }
+        ]
+       },
+      { path: '/memory', name:'memory',component: MemoryView },
+      { path: '/summary', name:'summary',component: SummaryView },
     ]
    },
-  { path: '/memory', name:'memory',component: MemoryView },
-  { path: '/summary', name:'summary',component: SummaryView },
+  { path: '/threadDetail', name:'threadDetail',component: ThreadDetail },
   { path: '/about', name:'about',component: AboutView },
   { path: '/error', name:'error',component: ErrorView },
 ]

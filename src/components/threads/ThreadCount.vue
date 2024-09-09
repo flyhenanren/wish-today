@@ -158,7 +158,7 @@ const tableData = ref([])
 
 const {createWindow} = useIpc();
 function openWindow(status: ThreadStatus) {
-    createWindow({ isMainWin: false, route: '/error'})
+    createWindow({ isMainWin: false, route: `/threadDetail?status=${status}`})
 };
 
 </script>

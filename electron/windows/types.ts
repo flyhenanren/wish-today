@@ -50,7 +50,7 @@ export const windowsCfg: IWindowsCfg = {
   height: null, //高度
   minWidth: null, //最小宽度
   minHeight: null, //最小高度
-  route: null, // 页面路由 URL '/manage?id=123'
+  route: "/", // 页面路由 URL '/manage?id=123'
   resizable: true, //是否支持调整窗口大小
   maximize: false, //是否最大化
   backgroundColor: "#eee", //窗口背景色
