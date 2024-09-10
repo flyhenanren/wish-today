@@ -8,18 +8,18 @@ import FlameGraph from '../components/cpu/FlameGraph.vue'
 import HotSpots from '../components/cpu/HotSpots.vue'
 import MethodsList from '../components/cpu/MethodsList.vue'
 
-import ThreadView from '../components/threads'
-import ThreadCount from '../components/threads/ThreadCount.vue'
-import IdenticalStackTrace from '../components/threads/IdenticalStackTrace.vue'
-import BlockingThreads from '../components/threads/BlockingThreads.vue'
-import DeadLock from '../components/threads/DeadLock.vue'
+import ThreadCount from '../components/thread/detail/ThreadCount.vue'
+import IdenticalStackTrace from '../components/thread/detail/IdenticalStackTrace.vue'
+import BlockingThreads from '../components/thread/detail/BlockingThreads.vue'
+import DeadLock from '../components/thread/detail/DeadLock.vue'
+
+import {DumpList, ThreadDetail} from '../components/thread'
 
 import MemoryView from '../components/memory'
 import SummaryView from '../components/summary'
 import ErrorView from '../view/Error.vue'
 import AboutView from '../view/About.vue'
 import HomeView from '../view/Home.vue'
-import ThreadDetail from '../view/ThreadDetail.vue'
 
 
 const routes = [
@@ -39,14 +39,7 @@ const routes = [
           { path: '/hotSpots', name: 'hotSpots',  component: HotSpots },
           { path: '/methodsList', name: 'methodsList',  component: MethodsList }
         ]},
-      { path: '/thread', name:'thread',component: ThreadView,
-        children:[
-          { path: '/threadCount', name: 'threadCount',  component: ThreadCount },
-          { path: '/identicalStackTrace', name: 'identicalStackTrace',  component: IdenticalStackTrace },
-          { path: '/blockingThreads', name: 'blockingThreads',  component: BlockingThreads },
-          { path: '/deadLock', name: 'deadLock',  component: DeadLock }
-        ]
-       },
+      { path: '/thread', name:'thread', component: DumpList,},
       { path: '/memory', name:'memory',component: MemoryView },
       { path: '/summary', name:'summary',component: SummaryView },
     ]

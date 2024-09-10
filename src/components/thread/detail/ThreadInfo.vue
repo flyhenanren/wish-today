@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from "vue"
-import { ThreadCount } from "./types";
-import { ThreadStatus } from "../../types";
+import { ThreadCount } from "../types";
+import { ThreadStatus } from "../../../types";
 import * as echarts from 'echarts';
-import useColor from "./hooks/useColor";
-import useIpc from "../../ipc/useIpc"
+import useColor from "../hooks/useColor";
+import useIpc from "../../../ipc/useIpc"
 
 const { getBackground, getForeground } = useColor()
 

@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import type { DataTableColumns } from 'naive-ui'
-import {useRoute} from 'vue-router'
-
-const route = useRoute();
+import ThreadInfo from './detail/ThreadInfo.vue';
 const split = ref(0.5)
 const splitMin = ref('100px')
 const splitMax = ref('300px')
 
-onMounted(() => {
-	console.log('rotute param:' + route.query.status)
-});
 
 
 interface RowData {
@@ -144,7 +139,7 @@ const rowKey = (row: RowData) => row.fileName
       </template>
       <template #right>
         <div class="demo-split-pane">
-          Right Pane
+          <ThreadInfo/>
         </div>
       </template>
     </Split>
@@ -153,7 +148,7 @@ const rowKey = (row: RowData) => row.fileName
 
 <style scoped>
 .demo-split {
-  height: 600px;
+  height: 800px;
   border: 1px solid #dcdee2;
 }
 
