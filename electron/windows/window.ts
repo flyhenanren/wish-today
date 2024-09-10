@@ -1,4 +1,13 @@
-import {app,BrowserWindow,shell,ipcMain,Menu,Tray,IpcMainEvent,} from "electron";
+import {
+  app,
+  BrowserWindow,
+  shell,
+  ipcMain,
+  Menu,
+  Tray,
+  dialog,
+  IpcMainEvent,
+} from "electron";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import os from "node:os";
@@ -68,7 +77,7 @@ export class window {
     let opt = this.defaultOption([args.width || 390, args.height || 590]);
     // 判断是否有父窗口
     if (args.parentId) {
-      console.log("parentId：" + args.parentId);
+      console.log("parentId:" + args.parentId);
       opt.parent = this.getWindow(args.parentId) as BrowserWindow; // 获取主窗口
     } else if (this.main) {
       console.log("current main window");
@@ -79,6 +88,7 @@ export class window {
     if (args.backgroundColor) opt.backgroundColor = args.backgroundColor; // 窗口背景色
     if (args.minWidth) opt.minWidth = args.minWidth;
     if (args.minHeight) opt.minHeight = args.minHeight;
+    if (args.isMainWin) opt.autoHideMenuBar = false;
 
     let win: BrowserWindow = new BrowserWindow(opt);
     console.log("window id:" + win.id);
@@ -100,7 +110,10 @@ export class window {
       this.main = win;
     }
     args.id = win.id;
-    win.on("close", () => win.setOpacity(0));
+    win.on("close", () => {
+      delete this.group[win.id];
+      win.setOpacity(0);
+    });
     if (VITE_DEV_SERVER_URL) {
       win.loadURL(`${VITE_DEV_SERVER_URL}#${args.route}`);
       // Open devTool if the app is not packaged
@@ -213,7 +226,7 @@ export class window {
 
     // 创建窗口
     ipcMain.on("window-new", (event: IpcMainEvent, args) => {
-      this.createWindows(args)
+      this.createWindows(args);
     });
   }
 
@@ -250,6 +263,112 @@ export class window {
     this.tray.setToolTip("测试托盘");
   }
 
+  createMenu() {
+    let newWindow: BrowserWindow | null = null;
+    //创建菜单集合
+    let template = [
+      {
+        label: "文件",
+        submenu: [
+          {
+            label: "打开文件",
+            accelerator: "ctrl+o", //绑定快捷键
+            click: () => {
+              dialog
+                .showOpenDialog({
+                  title: "选择压缩包",
+                })
+                .then((result) => {
+                  if (!result.canceled) {
+                    console.log(result.filePaths);
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            },
+          },
+          {
+            label: "打开文件夹",
+            accelerator: "ctrl+k", //绑定快捷键
+            click: () => {},
+          },
+          {
+            label: "新建窗口",
+            accelerator: "ctrl+shift+n",
+            click: () => {
+              //绑定事件
+              newWindow = new BrowserWindow({
+                width: 500,
+                height: 300,
+                //主题渲染内容
+                webPreferences: {
+                  nodeIntegration: true, //集成node环境
+                },
+              });
+              newWindow.loadFile("index.html");
+              newWindow.on("closed", () => {
+                newWindow = null;
+              });
+            },
+          },
+        ],
+      },
+      {
+        label: "视图",
+        submenu: [
+          {
+            label: "CPU",
+            click: () => {},
+          },
+          {
+            label: "线程",
+            click: () => {},
+          },
+          {
+            label: "内存",
+            click: () => {},
+          },
+          {
+            label: "总结",
+            click: () => {},
+          },
+        ],
+      },
+      {
+        label: "CPU",
+        submenu: [
+          {
+            label: "更多",
+            click: () => {},
+          },
+        ],
+      },
+      ,
+      {
+        label: "Memory",
+        submenu: [
+          {
+            label: "更多",
+            click: () => {},
+          },
+        ],
+      },
+      {
+        label: "帮助(H)",
+        submenu: [
+          {
+            label: "更多",
+            click: () => {},
+          },
+        ],
+      },
+    ];
+    //载入模板
+    const menu = Menu.buildFromTemplate(template);
+    //主进程设置应用菜单
+    Menu.setApplicationMenu(menu);
+  }
   // 窗口配置
   defaultOption(wh: Array<number> = []): IWindowOpt {
     return {
