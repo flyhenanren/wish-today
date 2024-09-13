@@ -6,6 +6,8 @@ import 'view-ui-plus/dist/styles/viewuiplus.css'
 
 import {
   NDataTable,
+  NSplit,
+  NDropdown,
   create
 } from 'naive-ui'
 
@@ -16,7 +18,7 @@ import './ipc/ipcListener'
 
 
 const naive = create({
-  components: [NDataTable]
+  components: [NDataTable, NSplit,NDropdown]
 })
 
 createApp(App)

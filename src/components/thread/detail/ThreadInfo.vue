@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from "vue"
+import { nextTick, onMounted, ref, defineProps, watch } from "vue"
 import { ThreadCount } from "../types";
 import { ThreadStatus } from "../../../types";
 import * as echarts from 'echarts';
@@ -7,6 +7,16 @@ import useColor from "../hooks/useColor";
 import useIpc from "../../../ipc/useIpc"
 
 const { getBackground, getForeground } = useColor()
+
+interface IProps {
+  fileName: String | undefined
+}
+
+const props = defineProps<IProps>()
+watch(() => props.fileName,
+  (value) => {
+    console.log("fileName:" + value)
+  })
 
 let threadTotal = ref(0)
 
@@ -73,6 +83,7 @@ onMounted(() => {
           type: 'pie',
           radius: '60%',
           data: data,
+          top: 50,
           label: {
             //echarts饼图内部显示百分比设置
             show: true,
@@ -129,7 +140,7 @@ function getStyle(status: ThreadStatus) {
     color: getForeground(status)
   }
 }
-function getFontColor(status: ThreadStatus){
+function getFontColor(status: ThreadStatus) {
   return {
     color: getForeground(status)
   }
@@ -143,7 +154,7 @@ const tableColumns = ref([
   {
     title: '数量',
     key: 'number',
-    width:100
+    width: 100
   },
   {
     title: '占比',
@@ -156,9 +167,9 @@ const tableData = ref([])
 
 
 
-const {createWindow} = useIpc();
+const { createWindow } = useIpc();
 function openWindow(status: ThreadStatus) {
-    createWindow({ isMainWin: false, route: `/threadDetail?status=${status}`})
+  createWindow({ isMainWin: false, route: `/threadDetail?status=${status}` })
 };
 
 </script>
@@ -182,7 +193,7 @@ function openWindow(status: ThreadStatus) {
             </div>
           </div>
         </div>
-        <div class="thread-count" style="width: 550px;height: 300px;">
+        <div class="thread-count" style="width: 550px;height: 400px;">
           <div ref="threadChart" style="width: 100%;height: 100%;"></div>
         </div>
       </div>
@@ -201,9 +212,9 @@ function openWindow(status: ThreadStatus) {
               <span>{{ row.threadName }}</span>
             </template>
             <template #percent="{ row, index }">
-                <span v-show="row.runnable" :style="getFontColor(ThreadStatus.RUNNABLE)">{{ row.runnable }}</span>
-                <span v-show="row.waiting" :style="getFontColor(ThreadStatus.RUNNABLE)"> {{ row.waiting }}</span>
-                <span v-show="row.timedWaiting" :style="getFontColor(ThreadStatus.RUNNABLE)">{{ row.timedWaiting }}</span>
+              <span v-show="row.runnable" :style="getFontColor(ThreadStatus.RUNNABLE)">{{ row.runnable }}</span>
+              <span v-show="row.waiting" :style="getFontColor(ThreadStatus.RUNNABLE)"> {{ row.waiting }}</span>
+              <span v-show="row.timedWaiting" :style="getFontColor(ThreadStatus.RUNNABLE)">{{ row.timedWaiting }}</span>
             </template>
           </Table>
         </div>
@@ -289,7 +300,8 @@ function openWindow(status: ThreadStatus) {
 .threadPoolTable {
   width: 100%;
 }
-.poolContainer{
+
+.poolContainer {
   display: flex;
   justify-content: space-between;
 }
