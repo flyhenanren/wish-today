@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import useSheet from '../hook/useSheet';
+import { Sheet } from '../types';
 
 const {sheets} = useSheet()
 
@@ -24,6 +25,11 @@ function handleClickTab(name: string) {
   }
 }
 
+
+function getTabComponent(item: Sheet){
+
+}
+
 </script>
 
 <template>
@@ -34,7 +40,7 @@ function handleClickTab(name: string) {
     @on-tab-remove="handleTabRemove"
     @on-click="handleClickTab">
         <TabPane v-for ="item in sheets" :name="item.key" :label="item.name" :v-if="item.show">
-          <RouterView/>
+            <RouterView/>
         </TabPane>
     </Tabs>
   </div>

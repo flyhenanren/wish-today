@@ -1,184 +1,47 @@
 <script setup lang="ts">
-import { h, nextTick, ref, watch } from 'vue'
+import { h, nextTick, onMounted, ref, watch } from 'vue'
 import type { DataTableColumns, DataTableRowKey, DropdownOption } from 'naive-ui'
+import { useDump } from '../../api/api';
 import ThreadInfo from './detail/ThreadInfo.vue';
 import DumpCount from './DumpCount.vue';
 const splitMin = ref(0.3)
 const splitMax = ref(0.6)
 
+const useFileApi = useDump()
 
-
+onMounted(()=>{
+  console.log("----------")
+  // useFileApi.list().then((resp: any) =>{
+  //    resp.forEach(e =>{
+  //     data.push({
+  //       file_name: e.file_name,
+  //       time: e.time,
+  //       alive: `${e.run_threads}/${e.threads}`,
+  //       block_threads: e.block_threads
+  //     })
+  //    })
+  // })
+})
 interface RowData {
-  fileName: string
-  timeStamp: string
+  file_name: string
+  time: string
   alive: string
-  gcCount: number
-  monitorCount: number
+  block_threads: number
 }
 
-const data: RowData[] = [
-  {
-    fileName: "threaddump_20240402_102234.txt_1",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_2",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_3",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_4",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_5",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_6",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_7",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_8",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_9",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_10",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_11",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_12",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_13",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_14",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_15",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_16",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
-  {
-    fileName: "threaddump_20240402_102234.txt_17",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  }, {
-    fileName: "threaddump_20240402_102234.txt_18",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  }, {
-    fileName: "threaddump_20240402_102234.txt_19",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  }, {
-    fileName: "threaddump_20240402_102234.txt_20",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  }, {
-    fileName: "threaddump_20240402_102234.txt_21",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  }, {
-    fileName: "threaddump_20240402_102234.txt_22",
-    timeStamp: "2024/04/02 10:22:34",
-    alive: "1/22",
-    gcCount: 0,
-    monitorCount: 0
-  },
+const data: RowData[] = []
 
-]
 const columns: DataTableColumns<RowData> = [
   {
     type: 'selection',
   },
   {
     title: '文件名',
-    key: 'fileName'
+    key: 'file_name'
   },
   {
     title: '时间',
-    key: 'timeStamp'
+    key: 'time'
   },
   {
     title: '运行中',
@@ -187,7 +50,7 @@ const columns: DataTableColumns<RowData> = [
   },
   {
     title: '阻塞',
-    key: 'monitorCount',
+    key: 'block_threads',
     width: 60
   }
 ]
@@ -196,7 +59,7 @@ function rowProps(row: RowData) {
   return {
     style: 'cursor: pointer;',
     onDblclick: () => {
-      selectedFile(row.fileName)
+      selectedFile(row.file_name)
     },
     onContextmenu: (e: MouseEvent) => {
       e.preventDefault()
@@ -209,7 +72,7 @@ function rowProps(row: RowData) {
     }
   }
 }
-const rowKey = (row: RowData) => row.fileName
+const rowKey = (row: RowData) => row.file_name
 
 const currentFile = ref<String | undefined>()
 
