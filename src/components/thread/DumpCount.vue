@@ -1,153 +1,233 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts';
 import { ThreadStatus } from '../../types';
+import { DumpInfo, StatusCount, StatusQuery, useDump } from '../../api/api';
+const dumpApi = useDump()
+interface IProps {
+  selected: DumpInfo[]
+}
+
+const props = defineProps<IProps>()
 
 const fileCount = ref(0)
-const startTime = ref('2024-04-04 04:04:04')
-const endTime = ref('2024-04-04 04:04:04')
+const startTime = ref<string>("1970-01-01 00:00:00")
+const endTime = ref<string>("9999-01-01 00:00:00")
+
+watch(() => props.selected,
+  (value) => {
+    initCountInfo(value)
+    initDumpStatus(value)
+    initThreadStatus(value)
+  },
+  { deep: true })
+
+function initCountInfo(rows: DumpInfo[]) {
+  fileCount.value = rows.length
+  startTime.value = rows[0].time
+  endTime.value = rows[rows.length - 1].time
+}
+function initDumpStatus(rows: DumpInfo[]) {
+  const queryParam: StatusQuery = {
+    files: rows.map(e => e.file_name)
+  }
+  dumpApi.countDumpStatus(queryParam).then((resp: StatusCount[]) => {
+    resp.forEach(e => {
+      percentColumns.value.push(e.name)
+      percentData.value[0].data.push(e.time_watting)
+      percentData.value[1].data.push(e.runnable)
+      percentData.value[2].data.push(e.waitting)
+      percentData.value[3].data.push(e.block)
+    })
+    drawPercentGraph()
+  })
+}
+
+function initThreadStatus(rows: DumpInfo[]) {
+  const queryParam: StatusQuery = {
+    files: rows.map(e => e.file_name),
+    total: 10
+  }
+  dumpApi.countThreadStatus(queryParam).then((resp: StatusCount[]) => {
+    resp.forEach(e => {
+      liveColumns.value.push(e.name)
+      liveData.value[0].data.push(e.time_watting)
+      liveData.value[1].data.push(e.runnable)
+      liveData.value[2].data.push(e.waitting)
+      liveData.value[3].data.push(e.block)
+    })
+    drawLiveGraph()
+  })
+}
+
+
+const percentData = ref<{
+  name: ThreadStatus,
+  type: string,
+  symbol: string,
+  smooth: boolean,
+  data: number[]
+}[]>(
+  [{
+    name: ThreadStatus.TIMED_WAITING,
+    type: 'line',
+    symbol: "none",
+    smooth: true,
+    data: []
+  },
+  {
+    name: ThreadStatus.RUNNABLE,
+    type: 'line',
+    symbol: "none",
+    smooth: true,
+    data: []
+  },
+  {
+    name: ThreadStatus.WAITING,
+    type: 'line',
+    symbol: "none",
+    smooth: true,
+    data: []
+  },
+  {
+    name: ThreadStatus.BLOCKED,
+    type: 'line',
+    symbol: "none",
+    smooth: true,
+    data: []
+  }])
+
+const percentColumns = ref<string[]>([])
 const dumpPercentChart = ref(null)
 let dumpPercentGraph: any = null
+
+function drawPercentGraph() {
+  dumpPercentGraph = echarts.init(dumpPercentChart.value)
+  const percentOption = {
+    title: {
+      text: '状态总览'
+    },
+    tooltip: {
+      trigger: 'axis'
+    },
+    legend: {
+      data: [ThreadStatus.RUNNABLE, ThreadStatus.TIMED_WAITING, ThreadStatus.WAITING, ThreadStatus.BLOCKED]
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: percentColumns.value
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: percentData.value
+  };
+  dumpPercentGraph.setOption(percentOption);
+}
+
+const liveData = ref<{
+  name: ThreadStatus,
+  type: string,
+  stack: string,
+  label: {
+    show: boolean
+  },
+  emphasis: {
+    focus: string
+  },
+  data: number[]
+}[]>([
+  {
+    name: ThreadStatus.TIMED_WAITING,
+    type: 'bar',
+    stack: 'total',
+    label: {
+      show: true
+    },
+    emphasis: {
+      focus: 'series'
+    },
+    data: []
+  },
+  {
+    name: ThreadStatus.RUNNABLE,
+    type: 'bar',
+    stack: 'total',
+    label: {
+      show: true
+    },
+    emphasis: {
+      focus: 'series'
+    },
+    data: []
+  },
+  {
+    name: ThreadStatus.WAITING,
+    type: 'bar',
+    stack: 'total',
+    label: {
+      show: true
+    },
+    emphasis: {
+      focus: 'series'
+    },
+    data: []
+  },
+  {
+    name: ThreadStatus.BLOCKED,
+    type: 'bar',
+    stack: 'total',
+    label: {
+      show: true
+    },
+    emphasis: {
+      focus: 'series'
+    },
+    data: []
+  }
+])
+const liveColumns = ref<String[]>([])
 const dumpLiveChart = ref(null)
 let dumpLiveGraph: any = null
-onMounted(() => {
-  nextTick(() => {
+function drawLiveGraph() {
+  dumpLiveGraph = echarts.init(dumpLiveChart.value)
+  const liveOption = {
+    title: {
+      text: '线程统计'
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        // Use axis to trigger tooltip
+        type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
+      }
+    },
+    legend: {},
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'value'
+    },
+    yAxis: {
+      type: 'category',
+      data: liveColumns.value
+    },
+    series: liveData.value
+  };
+  dumpLiveGraph.setOption(liveOption);
+}
 
-    dumpPercentGraph = echarts.init(dumpPercentChart.value)
-    const percentOption = {
-      title: {
-        text: '状态总览'
-      },
-      tooltip: {
-        trigger: 'axis'
-      },
-      legend: {
-        data: [ThreadStatus.RUNNABLE, ThreadStatus.TIMED_WAITING, ThreadStatus.WAITING, ThreadStatus.BLOCKED]
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-      },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-      },
-      yAxis: {
-        type: 'value'
-      },
-      series: [
-        {
-          name: ThreadStatus.TIMED_WAITING,
-          type: 'line',
-          stack: 'Total',
-          data: [220, 182, 191, 234, 290, 330, 310]
-        },
-        {
-          name: ThreadStatus.RUNNABLE,
-          type: 'line',
-          stack: 'Total',
-          data: [120, 132, 101, 134, 90, 230, 210]
-        },
-        {
-          name: ThreadStatus.WAITING,
-          type: 'line',
-          stack: 'Total',
-          data: [150, 232, 201, 154, 190, 330, 410]
-        },
-        {
-          name: ThreadStatus.BLOCKED,
-          type: 'line',
-          stack: 'Total',
-          data: [320, 332, 301, 334, 390, 330, 320]
-        }
-      ]
-    };
-    dumpPercentGraph.setOption(percentOption);
-
-    dumpLiveGraph = echarts.init(dumpLiveChart.value)
-    const liveOption = {
-      title: {
-        text: '线程统计'
-      },
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          // Use axis to trigger tooltip
-          type: 'shadow' // 'shadow' as default; can also be 'line' or 'shadow'
-        }
-      },
-      legend: {},
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-      },
-      xAxis: {
-        type: 'value'
-      },
-      yAxis: {
-        type: 'category',
-        data: ['JOB_BI_JOB_THREAD_176', 'clientOutboundChannel-595', 'clientOutboundChannel-590', 'MessageBroker-30', 'IMMEDIATELY_ASYNCTASKPOOL-1-thread-3', 'pool-6-thread-36', 'Sun']
-      },
-      series: [
-        {
-          name: ThreadStatus.TIMED_WAITING,
-          type: 'bar',
-          stack: 'total',
-          label: {
-            show: true
-          },
-          emphasis: {
-            focus: 'series'
-          },
-          data: [320, 302, 301, 334, 390, 330, 320]
-        },
-        {
-          name: ThreadStatus.RUNNABLE,
-          type: 'bar',
-          stack: 'total',
-          label: {
-            show: true
-          },
-          emphasis: {
-            focus: 'series'
-          },
-          data: [120, 132, 101, 134, 90, 230, 210]
-        },
-        {
-          name: ThreadStatus.WAITING,
-          type: 'bar',
-          stack: 'total',
-          label: {
-            show: true
-          },
-          emphasis: {
-            focus: 'series'
-          },
-          data: [220, 182, 191, 234, 290, 330, 310]
-        },
-        {
-          name: ThreadStatus.BLOCKED,
-          type: 'bar',
-          stack: 'total',
-          label: {
-            show: true
-          },
-          emphasis: {
-            focus: 'series'
-          },
-          data: [150, 212, 201, 154, 190, 330, 410]
-        }
-      ]
-    };
-    dumpLiveGraph.setOption(liveOption);
-
-  })
-})
 </script>
 
 <template>
@@ -167,12 +247,11 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
 .dump-list {
   /* padding: 10px; */
 }
 
-.dump-live-container{
+.dump-live-container {
   padding: 15px 10px;
 }
 

@@ -44,7 +44,7 @@ export function get<T>(url: string, params?: any): Promise<T> {
    return axios.get<T>(url, { params })
       .then(response => response.data)
       .catch(error => {
-         throw error;
+        return Promise.reject(error);
       });
 }
 
@@ -53,7 +53,7 @@ export function post<T>(url: string, data?: any): Promise<T> {
    return axios.post<T>(url, data)
       .then(response => response.data)
       .catch(error => {
-         throw error;
+        return Promise.reject(error);
       });
 }
 
@@ -62,7 +62,7 @@ export function put<T>(url: string, data?: any): Promise<T> {
    return axios.put<T>(url, data)
       .then(response => response.data)
       .catch(error => {
-         throw error;
+        return Promise.reject(error);
       });
 }
 //delete
@@ -70,7 +70,7 @@ export function del<T>(url: string): Promise<T> {
    return axios.delete<T>(url)
       .then(response => response.data)
       .catch(error => {
-         throw error;
+        return Promise.reject(error);
       });
 }
 

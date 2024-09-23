@@ -1,27 +1,36 @@
 <script setup lang="ts">
 import { h, nextTick, onMounted, ref, watch } from 'vue'
 import type { DataTableColumns, DataTableRowKey, DropdownOption } from 'naive-ui'
-import { useDump } from '../../api/api';
-import ThreadInfo from './detail/ThreadInfo.vue';
+import { DumpInfo, useDump } from '../../api/api';
 import DumpCount from './DumpCount.vue';
 const splitMin = ref(0.3)
 const splitMax = ref(0.6)
 
 const useFileApi = useDump()
 
-onMounted(()=>{
-  console.log("----------")
-  // useFileApi.list().then((resp: any) =>{
-  //    resp.forEach(e =>{
-  //     data.push({
-  //       file_name: e.file_name,
-  //       time: e.time,
-  //       alive: `${e.run_threads}/${e.threads}`,
-  //       block_threads: e.block_threads
-  //     })
-  //    })
-  // })
+
+const selectedRows = ref<DumpInfo[]>([])
+
+onMounted(() => {
+  useFileApi.list().then((resp: DumpInfo[]) => {
+    buildRows(resp)
+  })
 })
+
+function buildRows(resp: DumpInfo[]) {
+  const tempRows = ref<DumpInfo[]>([])
+  resp.forEach(e =>{
+    data.value.push({
+      file_name: e.file_name,
+      time: e.time,
+      alive: `${e.run_threads}/${e.threads}`,
+      block_threads: e.block_threads
+    })
+    checkedRowKeys.value.push(e.file_name)
+    tempRows.value.push(e)
+  })
+  selectedRows.value = tempRows.value
+}
 interface RowData {
   file_name: string
   time: string
@@ -29,7 +38,7 @@ interface RowData {
   block_threads: number
 }
 
-const data: RowData[] = []
+const data = ref<RowData[]>([])
 
 const columns: DataTableColumns<RowData> = [
   {
@@ -41,7 +50,8 @@ const columns: DataTableColumns<RowData> = [
   },
   {
     title: '时间',
-    key: 'time'
+    key: 'time',
+    width: 200
   },
   {
     title: '运行中',
@@ -83,7 +93,7 @@ function selectedFile(fileName: String) {
 function handleCheck(rowKeys: DataTableRowKey[]) {
   console.log(rowKeys)
 }
-const checkedRowKeys = ref(['threaddump_20240402_102234.txt_8'])
+const checkedRowKeys = ref<String[]>([])
 
 watch(() => checkedRowKeys.value,
   (value) => {
@@ -108,9 +118,9 @@ const yRef = ref(0)
 
 function onClickoutside() {
   showDropdownRef.value = false
- 
+
 }
-function handleSelect(item: DropdownOption){
+function handleSelect(item: DropdownOption) {
   showDropdownRef.value = false
   console.log(item)
 }
@@ -124,13 +134,12 @@ function handleSelect(item: DropdownOption){
           <n-data-table virtual-scroll v-model:checked-row-keys="checkedRowKeys" size="small" max-height="800px"
             :row-props="rowProps" :columns="columns" :data="data" :row-key="rowKey"
             @update:checked-row-keys="handleCheck" />
-          <n-dropdown placement="bottom-start" trigger="manual" :x="xRef" :y="yRef" :options="options" :show="showDropdownRef"
-            :on-clickoutside="onClickoutside" @select="handleSelect" />
+          <n-dropdown placement="bottom-start" trigger="manual" :x="xRef" :y="yRef" :options="options"
+            :show="showDropdownRef" :on-clickoutside="onClickoutside" @select="handleSelect" />
         </div>
       </template>
       <template #2>
-        <!-- <ThreadInfo :fileName="currentFile"/> -->
-        <DumpCount />
+        <DumpCount :selected="selectedRows"/>
       </template>
     </n-split>
   </div>
