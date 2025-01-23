@@ -7,6 +7,7 @@ import {
   Tray,
   dialog,
   IpcMainEvent,
+  MenuItem,
 } from "electron";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
@@ -15,6 +16,8 @@ import path from "node:path";
 import { IGroup, IWindowOpt, windowsCfg } from "./types";
 
 const require = createRequire(import.meta.url);
+const axios = require('axios')  // 用于发送 HTTP 请求
+axios.defaults.baseURL = import.meta.env.VITE_API_DOMAIN;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 process.env.APP_ROOT = path.join(__dirname, "../..");
@@ -263,112 +266,74 @@ export class window {
     this.tray.setToolTip("测试托盘");
   }
 
-  createMenu() {
+  async createMenu() {
+
+      // 创建主菜单
+    const menu = new Menu()
+
+    // 创建第一级菜单
+    const fileMenu = new Menu()
+
+    // 通过异步请求获取二级菜单内容
+    const openSapceMenu = await this.createWorkSapceMenu()
+
+    
+    fileMenu.append(new MenuItem({ label: '打开文件',
+      accelerator: "ctrl+o", 
+      click: () => {
+      dialog
+        .showOpenDialog({
+          title: "选择压缩包",
+        })
+        .then((result) => {
+          if (!result.canceled) {
+            console.log(result.filePaths);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },}))
+    fileMenu.append(new MenuItem({ label: '打开最近的文件', submenu: openSapceMenu }))
+    
     let newWindow: BrowserWindow | null = null;
-    //创建菜单集合
-    let template = [
-      {
-        label: "文件",
-        submenu: [
-          {
-            label: "打开文件",
-            accelerator: "ctrl+o", //绑定快捷键
-            click: () => {
-              dialog
-                .showOpenDialog({
-                  title: "选择压缩包",
-                })
-                .then((result) => {
-                  if (!result.canceled) {
-                    console.log(result.filePaths);
-                  }
-                })
-                .catch((err) => {
-                  console.log(err);
-                });
-            },
+    fileMenu.append(new MenuItem({ label: '新建窗口', accelerator: "ctrl+shift+n",
+      click: () => {
+        //绑定事件
+        newWindow = new BrowserWindow({
+          width: 500,
+          height: 300,
+          //主题渲染内容
+          webPreferences: {
+            nodeIntegration: true, //集成node环境
           },
-          {
-            label: "打开文件夹",
-            accelerator: "ctrl+k", //绑定快捷键
-            click: () => {},
-          },
-          {
-            label: "新建窗口",
-            accelerator: "ctrl+shift+n",
-            click: () => {
-              //绑定事件
-              newWindow = new BrowserWindow({
-                width: 500,
-                height: 300,
-                //主题渲染内容
-                webPreferences: {
-                  nodeIntegration: true, //集成node环境
-                },
-              });
-              newWindow.loadFile("index.html");
-              newWindow.on("closed", () => {
-                newWindow = null;
-              });
-            },
-          },
-        ],
-      },
-      {
-        label: "视图",
-        submenu: [
-          {
-            label: "CPU",
-            click: () => {},
-          },
-          {
-            label: "线程",
-            click: () => {},
-          },
-          {
-            label: "内存",
-            click: () => {},
-          },
-          {
-            label: "总结",
-            click: () => {},
-          },
-        ],
-      },
-      {
-        label: "CPU",
-        submenu: [
-          {
-            label: "更多",
-            click: () => {},
-          },
-        ],
-      },
-      ,
-      {
-        label: "Memory",
-        submenu: [
-          {
-            label: "更多",
-            click: () => {},
-          },
-        ],
-      },
-      {
-        label: "帮助(H)",
-        submenu: [
-          {
-            label: "更多",
-            click: () => {},
-          },
-        ],
-      },
-    ];
-    //载入模板
-    const menu = Menu.buildFromTemplate(template);
-    //主进程设置应用菜单
-    Menu.setApplicationMenu(menu);
+        });
+        newWindow.loadFile("index.html");
+        newWindow.on("closed", () => {
+          newWindow = null;
+        });
+      },}))
+    
+   
+    const viewMenu = new Menu()
+    const cpuMenu = new Menu()
+    const memoryMenu = new Menu()
+    const helpMenu = new Menu()
+
+    
+
+    // 将二级菜单添加到主菜单
+    menu.append(new MenuItem({ label: '文件', submenu: fileMenu }))
+    menu.append(new MenuItem({ label: '视图', submenu: viewMenu }))
+    menu.append(new MenuItem({ label: 'cpu', submenu: cpuMenu }))
+    menu.append(new MenuItem({ label: 'memory', submenu: memoryMenu }))
+    menu.append(new MenuItem({ label: '帮助', submenu: helpMenu }))
+
+    // 设置应用的菜单
+    Menu.setApplicationMenu(menu)
+
   }
+  
   // 窗口配置
   defaultOption(wh: Array<number> = []): IWindowOpt {
     return {
@@ -392,5 +357,32 @@ export class window {
         preload: preload,
       },
     };
+  }
+
+  async createWorkSapceMenu(){
+      // 创建动态获取的二级菜单
+    const editMenu = new Menu()
+
+    // 通过异步请求获取二级菜单内容
+    const submenuItems = await this.fetchSubMenu()
+
+    // 根据获取到的子菜单数据创建菜单项
+    submenuItems.forEach(item => {
+      editMenu.append(new MenuItem({ label: item.file_path, click: () => { 
+        console.log(item.file_path)
+       } }))
+    })
+    return editMenu;
+  }
+
+  async fetchSubMenu() {
+    try {
+      // 模拟从后端获取数据
+      const response = await axios.get('/file/list')
+      return response.data  // 假设返回的数据是一个数组
+    } catch (error) {
+      console.error('Error fetching submenu:', error)
+      return []
+    }
   }
 }

@@ -24,6 +24,9 @@ watch(() => props.selected,
 
 function initCountInfo(rows: DumpInfo[]) {
   fileCount.value = rows.length
+  if (rows.length === 0) {
+    return
+  }
   startTime.value = rows[0].time
   endTime.value = rows[rows.length - 1].time
 }
