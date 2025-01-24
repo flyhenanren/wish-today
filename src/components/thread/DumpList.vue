@@ -4,19 +4,19 @@ import type { DataTableColumns, DataTableRowKey, DropdownOption  } from 'naive-u
 import {useMessage} from 'naive-ui'
 import { DumpInfo, useDump } from '../../api/api';
 import DumpCount from './DumpCount.vue';
-
+import useIpc from '../../ipc/useIpc';
 const message = useMessage()
+const {onOpenSpace} = useIpc()
 
 const splitMin = ref(0.3)
 const splitMax = ref(0.6)
 
 const useFileApi = useDump()
 
-
 const selectedRows = ref<DumpInfo[]>([])
 
-onMounted(() => {
-  useFileApi.list().then((resp) => {
+onOpenSpace('open-work-space',(_event: any, arg: any) => {
+  useFileApi.list(arg.id).then((resp) => {
     if(resp.code === 200){
       buildRows(resp.data)
     }else{
@@ -24,6 +24,7 @@ onMounted(() => {
     }
   })
 })
+
 
 function buildRows(resp: DumpInfo[]) {
   const tempRows = ref<DumpInfo[]>([])

@@ -287,7 +287,7 @@ export class window {
         })
         .then((result) => {
           if (!result.canceled) {
-            console.log(result.filePaths);
+            this.openFile(result.filePaths[0]);
           }
         })
         .catch((err) => {
@@ -369,8 +369,7 @@ export class window {
     // 根据获取到的子菜单数据创建菜单项
     submenuItems.forEach(item => {
       menu.append(new MenuItem({ label: item.file_path, click: () => { 
-        this.main.webContents.send('open-work-space', item.id)
-        console.log(item.id)
+        this.main.webContents.send('open-work-space', item)
        } }))
     })
     return menu;
@@ -389,4 +388,17 @@ export class window {
       return []
     }
   }
+
+  async openFile(file_path: string) {
+    try {
+      const response = await axios.post('/file/open', file_path)
+      if(response.status === 200 && response.data.code === 200) {
+
+      }
+    } catch (error) {
+      console.error('Error open file:', error)
+    }
+  }
+
+  
 }

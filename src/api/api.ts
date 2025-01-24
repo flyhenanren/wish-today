@@ -22,8 +22,8 @@ export function useFile() {
 
 export function useDump() {
   const root = "/dump";
-  function list(): Promise<Response<DumpInfo[]>> {
-    return get<DumpInfo[]>(`${root}/list`);
+  function list(workSapceId: string): Promise<Response<DumpInfo[]>> {
+    return get<DumpInfo[]>(`${root}/list/${workSapceId}`);
   }
   function queryDetail(fileName: String) {
     return post(`${root}/query`, fileName);
