@@ -361,25 +361,29 @@ export class window {
 
   async createWorkSapceMenu(){
       // 创建动态获取的二级菜单
-    const editMenu = new Menu()
+    const menu = new Menu()
 
     // 通过异步请求获取二级菜单内容
     const submenuItems = await this.fetchSubMenu()
 
     // 根据获取到的子菜单数据创建菜单项
     submenuItems.forEach(item => {
-      editMenu.append(new MenuItem({ label: item.file_path, click: () => { 
-        console.log(item.file_path)
+      menu.append(new MenuItem({ label: item.file_path, click: () => { 
+        this.main.webContents.send('open-work-space', item.id)
+        console.log(item.id)
        } }))
     })
-    return editMenu;
+    return menu;
   }
 
   async fetchSubMenu() {
     try {
-      // 模拟从后端获取数据
       const response = await axios.get('/file/list')
-      return response.data  // 假设返回的数据是一个数组
+      console.log(response)
+      if (response.data.code === 200) {
+        return response.data.data
+      } 
+      return []  // 假设返回的数据是一个数组
     } catch (error) {
       console.error('Error fetching submenu:', error)
       return []

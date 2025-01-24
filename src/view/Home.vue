@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import useSheet from '../hook/useSheet';
-import { Sheet } from '../types';
 
 const {sheets} = useSheet()
 

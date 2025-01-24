@@ -1,4 +1,4 @@
-import { get, post } from "./axios";
+import { get, post, Response } from "./axios";
 
 export function useApi() {
   function check() {
@@ -22,16 +22,16 @@ export function useFile() {
 
 export function useDump() {
   const root = "/dump";
-  function list(): Promise<DumpInfo[]> {
+  function list(): Promise<Response<DumpInfo[]>> {
     return get<DumpInfo[]>(`${root}/list`);
   }
   function queryDetail(fileName: String) {
     return post(`${root}/query`, fileName);
   }
-  function countDumpStatus(param: StatusQuery): Promise<StatusCount[]>  {
+  function countDumpStatus(param: StatusQuery): Promise<Response<StatusCount[]>>  {
     return post<StatusCount[]>(`${root}/count_dump`, param);
   }
-  function countThreadStatus(param: StatusQuery) : Promise<StatusCount[]> {
+  function countThreadStatus(param: StatusQuery) : Promise<Response<StatusCount[]>> {
     return post<StatusCount[]>(`${root}/count_threads`, param);
   }
   return {

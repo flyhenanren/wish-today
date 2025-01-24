@@ -38,10 +38,15 @@ axios.interceptors.response.use(
   }
 );
 
+export type Response<T = any> = {
+  code: number;
+  data: T;
+  message?: string;
+};
 
 // 封装GET请求
-export function get<T>(url: string, params?: any): Promise<T> {
-   return axios.get<T>(url, { params })
+export function get<T>(url: string, params?: any): Promise<Response<T>> {
+   return axios.get<Response<T>>(url, { params })
       .then(response => response.data)
       .catch(error => {
         return Promise.reject(error);
@@ -49,8 +54,8 @@ export function get<T>(url: string, params?: any): Promise<T> {
 }
 
 // 封装POST请求
-export function post<T>(url: string, data?: any): Promise<T> {
-   return axios.post<T>(url, data)
+export function post<T>(url: string, data?: any): Promise<Response<T>> {
+   return axios.post<Response<T>>(url, data)
       .then(response => response.data)
       .catch(error => {
         return Promise.reject(error);
@@ -58,16 +63,16 @@ export function post<T>(url: string, data?: any): Promise<T> {
 }
 
 // put
-export function put<T>(url: string, data?: any): Promise<T> {
-   return axios.put<T>(url, data)
+export function put<T>(url: string, data?: any): Promise<Response<T>> {
+   return axios.put<Response<T>>(url, data)
       .then(response => response.data)
       .catch(error => {
         return Promise.reject(error);
       });
 }
 //delete
-export function del<T>(url: string): Promise<T> {
-   return axios.delete<T>(url)
+export function del<T>(url: string): Promise<Response<T>> {
+   return axios.delete<Response<T>>(url)
       .then(response => response.data)
       .catch(error => {
         return Promise.reject(error);

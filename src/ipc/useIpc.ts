@@ -4,8 +4,14 @@ export default function () {
     window.ipcRenderer.send('window-new', opt)
   }
 
-  return{
-    createWindow
+  function onOpenSapce(event: string, cb: (_event: any, workSapceId: string)=>void) {
+    window.ipcRenderer.on(event, cb)
   }
+
+  return{
+    createWindow,
+    onOpenSapce
+  }
+
 }
 

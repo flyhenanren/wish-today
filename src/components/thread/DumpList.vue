@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { h, nextTick, onMounted, ref, watch } from 'vue'
-import type { DataTableColumns, DataTableRowKey, DropdownOption } from 'naive-ui'
+import type { DataTableColumns, DataTableRowKey, DropdownOption  } from 'naive-ui'
+import {useMessage} from 'naive-ui'
 import { DumpInfo, useDump } from '../../api/api';
 import DumpCount from './DumpCount.vue';
+
+const message = useMessage()
+
 const splitMin = ref(0.3)
 const splitMax = ref(0.6)
 
@@ -12,8 +16,12 @@ const useFileApi = useDump()
 const selectedRows = ref<DumpInfo[]>([])
 
 onMounted(() => {
-  useFileApi.list().then((resp: DumpInfo[]) => {
-    buildRows(resp)
+  useFileApi.list().then((resp) => {
+    if(resp.code === 200){
+      buildRows(resp.data)
+    }else{
+      message.error(resp.message!)
+    }
   })
 })
 

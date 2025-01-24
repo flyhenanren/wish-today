@@ -11,6 +11,9 @@ if(window.ipcRenderer){
   window.ipcRenderer.on('main-process-message-sub', (_event, ...args) => {
     console.log('[Receive Main-process message-sub]:', ...args)
   })
+  window.ipcRenderer.on('open-work-space', (_event, ...args) => {
+    console.log('[Receive open-work-space]:', ...args)
+  })
 }
 
 

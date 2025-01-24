@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-
-console.log("App")
 
 </script>
 
 <template>
-  <div :class="$style.rootContainer">
+  <n-message-provider>
+    <div :class="$style.rootContainer">
     <RouterView/>
-  </div>
+  </div>  
+</n-message-provider>
 </template>
 
 <style scoped module>
