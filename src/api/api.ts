@@ -28,21 +28,22 @@ export function useDump() {
   function queryDetail(fileName: String) {
     return post(`${root}/query`, fileName);
   }
-  function countDumpStatus(param: StatusQuery): Promise<Response<StatusCount[]>>  {
-    return post<StatusCount[]>(`${root}/count_dump`, param);
+  function countFileStatus(param: StatusQuery): Promise<Response<StatusCount[]>>  {
+    return post<StatusCount[]>(`${root}/count_file_status`, param);
   }
   function countThreadStatus(param: StatusQuery) : Promise<Response<StatusCount[]>> {
-    return post<StatusCount[]>(`${root}/count_threads`, param);
+    return post<StatusCount[]>(`${root}/count_thread_status`, param);
   }
   return {
     list,
     queryDetail,
-    countDumpStatus,
+    countFileStatus,
     countThreadStatus,
   };
 }
 
 export interface DumpInfo {
+  file_id: string;
   block_threads: number;
   end_line: number;
   file_name: string;

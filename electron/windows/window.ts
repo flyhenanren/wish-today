@@ -274,10 +274,7 @@ export class window {
     // 创建第一级菜单
     const fileMenu = new Menu()
 
-    // 通过异步请求获取二级菜单内容
-    const openSapceMenu = await this.createWorkSapceMenu()
 
-    
     fileMenu.append(new MenuItem({ label: '打开文件',
       accelerator: "ctrl+o", 
       click: () => {
@@ -294,7 +291,8 @@ export class window {
           console.log(err);
         });
     },}))
-    fileMenu.append(new MenuItem({ label: '打开最近的文件', submenu: openSapceMenu }))
+    
+    fileMenu.append(new MenuItem({ id:'openRecent',label: '打开最近的文件', submenu: [],  }))
     
     let newWindow: BrowserWindow | null = null;
     fileMenu.append(new MenuItem({ label: '新建窗口', accelerator: "ctrl+shift+n",
@@ -320,7 +318,6 @@ export class window {
     const memoryMenu = new Menu()
     const helpMenu = new Menu()
 
-    
 
     // 将二级菜单添加到主菜单
     menu.append(new MenuItem({ label: '文件', submenu: fileMenu }))
@@ -329,6 +326,36 @@ export class window {
     menu.append(new MenuItem({ label: 'memory', submenu: memoryMenu }))
     menu.append(new MenuItem({ label: '帮助', submenu: helpMenu }))
 
+
+    // 动态更新二级菜单
+    const openRecent = menu.getMenuItemById('openRecent')
+    openRecent.submenu.on('menu-will-show', async () => {
+      console.log('Dynamic Menu will show');
+      const newSubMenuItems = await this.fetchSubMenu();
+
+      // 移除当前的所有子菜单项
+      if (openRecent.submenu.items.length > 0) {
+        openRecent.submenu = new Menu()
+      }
+
+      // 添加新的二级菜单项
+      newSubMenuItems.forEach((item) => {
+        openRecent.submenu.append(new MenuItem({ label: item.file_path, click: () => { 
+          this.main.webContents.send('open-work-space', item)
+         } }))
+      });
+
+      if(newSubMenuItems.length !== 0) {
+        openRecent.submenu.append(new MenuItem({ type: 'separator' }))
+        openRecent.submenu.append(new MenuItem({ label: '清空最近的文件', click: () => {
+          this.cleanSubMenu().then(() => {
+            this.main.webContents.send('clean-work-space')
+          })
+        }}))
+      }
+
+      Menu.setApplicationMenu(menu); // 更新菜单
+  });
     // 设置应用的菜单
     Menu.setApplicationMenu(menu)
 
@@ -368,17 +395,17 @@ export class window {
 
     // 根据获取到的子菜单数据创建菜单项
     submenuItems.forEach(item => {
-      menu.append(new MenuItem({ label: item.file_path, click: () => { 
-        this.main.webContents.send('open-work-space', item)
-       } }))
+    
     })
+    if(submenuItems.length !== 0){
+      
+    }
     return menu;
   }
 
   async fetchSubMenu() {
     try {
       const response = await axios.get('/file/list')
-      console.log(response)
       if (response.data.code === 200) {
         return response.data.data
       } 
@@ -400,5 +427,17 @@ export class window {
     }
   }
 
+  async cleanSubMenu() {
+    try {
+      const response = await axios.get('/file/clean')
+      if (response.data.code === 200) {
+        return response.data.data
+      } 
+      return []  // 假设返回的数据是一个数组
+    } catch (error) {
+      console.error('Error fetching submenu:', error)
+      return []
+    }
+  }
   
 }

@@ -3,6 +3,7 @@ import { nextTick, onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts';
 import { ThreadStatus } from '../../types';
 import { DumpInfo, StatusCount, StatusQuery, useDump } from '../../api/api';
+import { Response } from '../../api/axios';
 const dumpApi = useDump()
 interface IProps {
   selected: DumpInfo[]
@@ -12,12 +13,10 @@ const props = defineProps<IProps>()
 
 const fileCount = ref(0)
 const startTime = ref<string>("1970-01-01 00:00:00")
-const endTime = ref<string>("9999-01-01 00:00:00")
-
+const endTime = ref<string>("9999-12-31 23:59:59")
 watch(() => props.selected,
   (value) => {
     initCountInfo(value)
-    initDumpStatus(value)
     initThreadStatus(value)
   },
   { deep: true })
@@ -30,37 +29,46 @@ function initCountInfo(rows: DumpInfo[]) {
   startTime.value = rows[0].time
   endTime.value = rows[rows.length - 1].time
 }
-function initDumpStatus(rows: DumpInfo[]) {
-  const queryParam: StatusQuery = {
-    files: rows.map(e => e.file_name)
-  }
-  dumpApi.countDumpStatus(queryParam).then((resp: StatusCount[]) => {
-    resp.forEach(e => {
-      percentColumns.value.push(e.name)
-      percentData.value[0].data.push(e.time_watting)
-      percentData.value[1].data.push(e.runnable)
-      percentData.value[2].data.push(e.waitting)
-      percentData.value[3].data.push(e.block)
-    })
-    drawPercentGraph()
-  })
-}
 
 function initThreadStatus(rows: DumpInfo[]) {
   const queryParam: StatusQuery = {
     files: rows.map(e => e.file_name),
     total: 10
   }
-  dumpApi.countThreadStatus(queryParam).then((resp: StatusCount[]) => {
-    resp.forEach(e => {
-      liveColumns.value.push(e.name)
-      liveData.value[0].data.push(e.time_watting)
-      liveData.value[1].data.push(e.runnable)
-      liveData.value[2].data.push(e.waitting)
-      liveData.value[3].data.push(e.block)
-    })
-    drawLiveGraph()
+  dumpApi.countThreadStatus(queryParam).then((resp: Response<StatusCount[]>) => {
+    if (resp.code === 200) {
+      buildThreadStatus(resp.data)
+      drawLiveGraph()
+    }
   })
+
+  dumpApi.countFileStatus(queryParam).then((resp: Response<StatusCount[]>) => {
+    if (resp.code === 200) {
+      buildFileStatus(resp.data)
+      drawPercentGraph()
+    }
+  })
+}
+
+
+function buildFileStatus(status: StatusCount[]){
+  status.forEach(e => {
+        percentColumns.value.push(e.name)
+        percentData.value[0].data.push(e.time_watting)
+        percentData.value[1].data.push(e.runnable)
+        percentData.value[2].data.push(e.waitting)
+        percentData.value[3].data.push(e.block)
+      })  
+}
+
+function buildThreadStatus(status: StatusCount[]){
+  status.forEach(e => {
+        liveColumns.value.push(e.name)
+        liveData.value[0].data.push(e.time_watting)
+        liveData.value[1].data.push(e.runnable)
+        liveData.value[2].data.push(e.waitting)
+        liveData.value[3].data.push(e.block)
+      })  
 }
 
 
