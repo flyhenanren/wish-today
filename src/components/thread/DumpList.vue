@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { h, nextTick, onMounted, ref, watch } from 'vue'
+import { h, nextTick, shallowRef, ref, watch } from 'vue'
 import type { DataTableColumns, DataTableRowKey, DropdownOption  } from 'naive-ui'
 import {useMessage} from 'naive-ui'
 import { DumpInfo, useDump } from '../../api/api';
 import DumpCount from './DumpCount.vue';
+import ThreadInfo from './detail/ThreadInfo.vue';
 import useIpc from '../../ipc/useIpc';
 const message = useMessage()
 const {onOpenSpace} = useIpc()
@@ -13,10 +14,33 @@ const splitMax = ref(0.6)
 
 const useFileApi = useDump()
 
+// 当前的文件
+const currentFile = ref<RowData | undefined>()
+const rowKey = (row: RowData) => row.file_id
+
+// 勾选的文件
 const selectedRows = ref<DumpInfo[]>([])
 
+const currentComponent = shallowRef<any>(DumpCount)
+const bindParam = ref<{
+  selected?: DumpInfo[]
+  file?: RowData
+}>({
+  selected: []
+})
 
-onOpenSpace('open-work-space',(_event: any, arg: any) => {
+const actionEvent = ref<{[key:string]: (...args:any[]) => void}>({
+  back: closeDetail
+})
+
+function closeDetail() {
+  currentComponent.value = DumpCount
+  bindParam.value = {
+    selected: selectedRows.value
+  }
+}
+
+onOpenSpace((_event: any, arg: any) => {
   useFileApi.list(arg.id).then((resp) => {
     if(resp.code === 200){
       buildRows(resp.data)
@@ -26,22 +50,23 @@ onOpenSpace('open-work-space',(_event: any, arg: any) => {
   })
 })
 
-
 function buildRows(resp: DumpInfo[]) {
-  const tempRows = ref<DumpInfo[]>([])
+  selectedRows.value = []
   resp.forEach(e =>{
     data.value.push({
+      file_id: e.file_id,
       file_name: e.file_name,
       time: e.time,
       alive: `${e.run_threads}/${e.threads}`,
       block_threads: e.block_threads
     })
-    checkedRowKeys.value.push(e.file_name)
-    tempRows.value.push(e)
+    checkedRowKeys.value.push(e.file_id)
+    selectedRows.value.push(e)
+    bindParam.value.selected = selectedRows.value
   })
-  selectedRows.value = tempRows.value
 }
 interface RowData {
+  file_id: string
   file_name: string
   time: string
   alive: string
@@ -56,34 +81,39 @@ const columns: DataTableColumns<RowData> = [
   },
   {
     title: '文件名',
-    key: 'file_name'
+    key: 'file_name',
+    className: 'show-text'
   },
   {
     title: '时间',
     key: 'time',
-    width: 200
+    width: 200,
+    className: 'show-text'
   },
   {
     title: '运行中',
     key: 'alive',
-    width: 100
+    width: 100,
+    className: 'show-text'
   },
   {
     title: '阻塞',
     key: 'block_threads',
-    width: 60
+    width: 60,
+    className: 'show-text'
   }
 ]
 
 function rowProps(row: RowData) {
   return {
     style: 'cursor: pointer;',
-    onDblclick: () => {
-      selectedFile(row.file_name)
+    onClick: () => {
+      selectedFile(row)
     },
     onContextmenu: (e: MouseEvent) => {
       e.preventDefault()
       showDropdownRef.value = false
+      currentFile.value = row
       nextTick().then(() => {
         showDropdownRef.value = true
         xRef.value = e.clientX
@@ -92,35 +122,52 @@ function rowProps(row: RowData) {
     }
   }
 }
-const rowKey = (row: RowData) => row.file_name
 
-const currentFile = ref<String | undefined>()
 
-function selectedFile(fileName: String) {
-  currentFile.value = fileName
+function selectedFile(file: RowData) {
+  currentFile.value = file
+  currentComponent.value = ThreadInfo
+  bindParam.value.file = file
 }
 
 function handleCheck(rowKeys: DataTableRowKey[]) {
-  console.log(rowKeys)
+
 }
-const checkedRowKeys = ref<String[]>([])
+const checkedRowKeys = ref<string[]>([])
 
-watch(() => checkedRowKeys.value,
-  (value) => {
-    console.log(checkedRowKeys.value)
-  })
-
+function rowClassName(row: RowData) {
+    if (row.file_id === currentFile.value?.file_id){
+      return 'selected-row'
+    }
+    return ''
+}
 
 const showDropdownRef = ref(false)
 
 const options: DropdownOption[] = [
   {
-    label: '编辑',
-    key: 'edit'
+    label: '线程详情',
+    key: 'threadDetail'
+  },
+  {
+    label: '锁详情',
+    key: 'monitorDetail'
+  },
+  {
+    label: '比较选中线程',
+    key: 'compareThreads'
+  },
+  {
+    label: '比较选中锁',
+    key: 'compareMonitors'
   },
   {
     label: () => h('span', { style: { color: 'red' } }, '删除'),
     key: 'delete'
+  },
+  {
+    label: () => h('span', { style: { color: 'red' } }, '删除所有'),
+    key: 'deleteAll'
   }
 ]
 const xRef = ref(0)
@@ -128,12 +175,11 @@ const yRef = ref(0)
 
 function onClickoutside() {
   showDropdownRef.value = false
-
 }
 function handleSelect(item: DropdownOption) {
   showDropdownRef.value = false
-  console.log(item)
 }
+
 </script>
 
 <template>
@@ -143,13 +189,19 @@ function handleSelect(item: DropdownOption) {
         <div class="dump-list">
           <n-data-table virtual-scroll v-model:checked-row-keys="checkedRowKeys" size="small" max-height="800px"
             :row-props="rowProps" :columns="columns" :data="data" :row-key="rowKey"
+            :row-class-name="rowClassName"
             @update:checked-row-keys="handleCheck" />
           <n-dropdown placement="bottom-start" trigger="manual" :x="xRef" :y="yRef" :options="options"
             :show="showDropdownRef" :on-clickoutside="onClickoutside" @select="handleSelect" />
         </div>
       </template>
       <template #2>
-        <DumpCount :selected="selectedRows"/>
+        <KeepAlive include="DumpCount">
+            <component :is="currentComponent" 
+            v-bind="bindParam"
+            v-on="actionEvent"
+            />
+        </KeepAlive>
       </template>
     </n-split>
   </div>
@@ -162,5 +214,11 @@ function handleSelect(item: DropdownOption) {
 
 .dump-list {
   /* padding: 10px; */
+}
+</style>
+
+<style>
+.selected-row  .show-text{
+  color: #18a058;
 }
 </style>

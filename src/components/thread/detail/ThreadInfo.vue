@@ -1,138 +1,112 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, defineProps, watch } from "vue"
+import { nextTick, onMounted, ref, defineProps, watch, reactive } from "vue"
 import { ThreadCount } from "../types";
 import { ThreadStatus } from "../../../types";
 import * as echarts from 'echarts';
 import useColor from "../hooks/useColor";
 import useIpc from "../../../ipc/useIpc"
+import useChart from "./useChart";
+import { PoolThreads, useDump } from "../../../api/api";
+
+
+const {listThreadsPool} = useDump()
 
 const { getBackground, getForeground } = useColor()
 
-interface IProps {
-  fileName: String | undefined
+export interface IProps {
+  file: any | undefined
 }
 
 const props = defineProps<IProps>()
-watch(() => props.fileName,
+const emit = defineEmits(["back"])
+watch(() => props.file,
   (value) => {
-    console.log("fileName:" + value)
+    if(value){
+      queryData()
+    }
+  },{immediate:true})
+
+function queryData(){
+  listThreadsPool(props.file.file_id!).then((resp) => {
+    if(resp.code === 200) {
+      resetParam()
+      buildRow(resp.data)
+    }
   })
+}
 
-let threadTotal = ref(0)
-
-let threadStatus = ref<ThreadCount[]>([])
-threadStatus.value.push({
-  count: 25,
+const runnable = {
+  count: 0,
   status: ThreadStatus.RUNNABLE,
   icon: 'ios-cog'
-})
-threadStatus.value.push({
-  count: 15,
-  status: ThreadStatus.WAITING,
-  icon: 'ios-pause'
-})
-threadStatus.value.push({
-  count: 9,
+}
+const timedWaiting = {
+  count: 0,
   status: ThreadStatus.TIMED_WAITING,
   icon: 'ios-time'
-})
-threadStatus.value.push({
-  count: 1,
+}
+const waiting = {
+  count: 0,
+  status: ThreadStatus.WAITING,
+  icon: 'ios-pause'
+}
+const blocked = {
+  count: 0,
   status: ThreadStatus.BLOCKED,
   icon: 'ios-lock'
-})
+}
 
-threadTotal.value = threadStatus.value.reduce((pre, cur) => {
-  return pre + cur.count
-}, 0)
+const threadTotal = ref(0)
+const threadPoolData = reactive<{value: number, name: string}[]>([])
+const threadStatus = reactive<ThreadCount[]>([])
+const tableData = reactive<PoolThreads[]>([])
+
+function resetParam(){
+  threadTotal.value = 0
+  runnable.count = 0
+  timedWaiting.count = 0
+  waiting.count = 0
+  blocked.count = 0
+  threadPoolData.splice(0, threadPoolData.length)
+  threadStatus.splice(0, threadStatus.length)
+  tableData.splice(0, tableData.length)
+}
+function buildRow(rows: PoolThreads[]) {
+  rows.sort((a, b) => b.count - a.count).forEach(e =>{
+    runnable.count += e.runnable
+    timedWaiting.count += e.time_waitting
+    waiting.count += e.waitting
+    blocked.count += e.block
+    threadTotal.value += 1
+    threadPoolData.push({
+      value: e.count,
+      name: e.count === 1 ? e.source_name : e.name
+    })
+  })
+  threadStatus.push(runnable)
+  threadStatus.push(timedWaiting)
+  threadStatus.push(waiting)
+  threadStatus.push(blocked)
+  threadPoolData.splice(0, threadPoolData.length, ...threadPoolData.slice(0,6))
+  buildGraph()
+  tableData.splice(0, rows.length, ...rows)
+}
+
 
 const threadChart = ref(null);
 let threadGraph: any = null;
 
 const threadPoolChart = ref(null);
 let theadPollGraph: any = null;
+const {buildThreadGraph,buildThreadPoolGraph} = useChart()
 
-onMounted(() => {
-  nextTick(() => {
+function buildGraph(){
     threadGraph = echarts.init(threadChart.value)
     theadPollGraph = echarts.init(threadPoolChart.value)
-    const data: any[] = []
-    threadStatus.value.forEach(e => {
-      data.push({
-        value: e.count,
-        name: e.status,
-        itemStyle: { color: getForeground(e.status) }
-      })
-    })
-    const threadOption = {
-      title: {
-        text: '线程百分比',
-        subtext: '按状态',
-        left: 'center'
-      },
-      tooltip: {
-        trigger: 'item'
-      },
-      legend: {
-        orient: 'vertical',
-        left: 'left'
-      },
-      series: [
-        {
-          name: '线程数量',
-          type: 'pie',
-          radius: '60%',
-          data: data,
-          top: 50,
-          label: {
-            //echarts饼图内部显示百分比设置
-            show: true,
-            position: "outside", //outside 外部显示  inside 内部显示
-            formatter: `{d}%`,
-            fontSize: 15 //字体大小
-          },
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)'
-            }
-          }
-        }
-      ]
-    };
+    threadGraph.setOption(buildThreadGraph(threadStatus));
+    theadPollGraph.setOption(buildThreadPoolGraph(threadPoolData))
+}
 
-    const threadPoolOption = {
-      legend: {
-        top: 'bottom'
-      },
-      series: [
-        {
-          name: 'Nightingale Chart',
-          type: 'pie',
-          radius: [20, 100],
-          center: ['50%', '50%'],
-          roseType: 'area',
-          itemStyle: {
-            borderRadius: 8
-          },
-          data: [
-            { value: 40, name: 'rose 1' },
-            { value: 38, name: 'rose 2' },
-            { value: 32, name: 'rose 3' },
-            { value: 30, name: 'rose 4' },
-            { value: 28, name: 'rose 5' },
-            { value: 26, name: 'rose 6' },
-            { value: 22, name: 'rose 7' },
-            { value: 18, name: 'rose 8' }
-          ]
-        }
-      ]
-    }
-    threadGraph.setOption(threadOption);
-    theadPollGraph.setOption(threadPoolOption)
-  })
-})
 
 function getStyle(status: ThreadStatus) {
   return {
@@ -149,34 +123,34 @@ function getFontColor(status: ThreadStatus) {
 const tableColumns = ref([
   {
     title: '线程名称',
-    slot: 'threadPool',
+    slot: 'name',
   },
   {
     title: '数量',
-    key: 'number',
+    key: 'count',
     width: 100
   },
   {
-    title: '占比',
+    title: '活跃占比',
     slot: 'percent',
     width: 250,
     align: 'center'
   }
 ])
-const tableData = ref([])
-
 
 
 const { createWindow } = useIpc();
 function openWindow(status: ThreadStatus) {
   createWindow({ isMainWin: false, route: `/threadDetail?status=${status}` })
 };
-
+function handleBack(){
+  emit('back')
+}
 </script>
 
 <template>
-  <div>
-    <div :class="$style.viewContainer">
+    <n-page-header :subtitle="props.file.file_name" @back="handleBack">
+      <div :class="$style.viewContainer">
       <div :class="$style.title">
         <span>Total Threads count: {{ threadTotal }} </span>
       </div>
@@ -193,7 +167,7 @@ function openWindow(status: ThreadStatus) {
             </div>
           </div>
         </div>
-        <div class="thread-count" style="width: 550px;height: 400px;">
+        <div class="thread-count" style="width: 400px;height: 300px;">
           <div ref="threadChart" style="width: 100%;height: 100%;"></div>
         </div>
       </div>
@@ -203,30 +177,28 @@ function openWindow(status: ThreadStatus) {
         <span>Thread Pools </span>
       </div>
       <div :class="$style.poolContainer">
-        <div class="thread-pool-count" style="width: 550px;height: 400px; margin-right: 20px;">
+        <div class="thread-pool-count" style="width: 550px;height: 370px; margin-right: 20px;">
           <div ref="threadPoolChart" style="width: 100%;height: 100%;"></div>
         </div>
         <div :class="$style.threadPoolTable">
-          <Table border :columns="tableColumns" :data="tableData">
-            <template #threadPool="{ row }">
-              <span>{{ row.threadName }}</span>
+          <Table border :columns="tableColumns" :data="tableData" height="350">
+            <template #name="{ row }">
+              <span>{{ row.count === 1 ? row.source_name :  row.name}}</span>
             </template>
             <template #percent="{ row, index }">
-              <span v-show="row.runnable" :style="getFontColor(ThreadStatus.RUNNABLE)">{{ row.runnable }}</span>
-              <span v-show="row.waiting" :style="getFontColor(ThreadStatus.RUNNABLE)"> {{ row.waiting }}</span>
-              <span v-show="row.timedWaiting" :style="getFontColor(ThreadStatus.RUNNABLE)">{{ row.timedWaiting }}</span>
+                <Progress hide-info :success-percent="(row.runnable / row.count) * 100" />
             </template>
           </Table>
         </div>
       </div>
     </div>
-  </div>
+    </n-page-header>
 </template>
 
 <style scoped module>
 .viewContainer {
   border-bottom: 1px solid #E8E8E8;
-  padding: 15px 10px;
+  padding: 0px 10px;
 }
 
 .title {
@@ -238,7 +210,7 @@ function openWindow(status: ThreadStatus) {
 }
 
 .threadIcon {
-  padding: 20px;
+  padding: 10px;
   border-radius: 50%;
   text-align: center;
   font-size: 20px;

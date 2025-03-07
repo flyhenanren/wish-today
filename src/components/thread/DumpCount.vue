@@ -16,10 +16,10 @@ const startTime = ref<string>("1970-01-01 00:00:00")
 const endTime = ref<string>("9999-12-31 23:59:59")
 watch(() => props.selected,
   (value) => {
-    initCountInfo(value)
-    initThreadStatus(value)
+    // initCountInfo(value)
+    // initThreadStatus(value)
   },
-  { deep: true })
+  { deep: true})
 
 function initCountInfo(rows: DumpInfo[]) {
   fileCount.value = rows.length

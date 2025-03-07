@@ -34,11 +34,15 @@ export function useDump() {
   function countThreadStatus(param: StatusQuery) : Promise<Response<StatusCount[]>> {
     return post<StatusCount[]>(`${root}/count_thread_status`, param);
   }
+  function listThreadsPool(fileId: string) : Promise<Response<PoolThreads[]>> {
+    return get<PoolThreads[]>(`${root}/list_thread_pool/${fileId}`);
+  }
   return {
     list,
     queryDetail,
     countFileStatus,
     countThreadStatus,
+    listThreadsPool
   };
 }
 
@@ -66,4 +70,14 @@ export interface StatusQuery {
   total?: number;
   exclude?: string[];
   status?: string[];
+}
+
+export interface PoolThreads{
+  name: string
+  source_name: string
+  count: number
+  runnable: number
+  waitting: number
+  time_waitting: number
+  block: number
 }

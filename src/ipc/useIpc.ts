@@ -4,10 +4,10 @@ export default function () {
     window.ipcRenderer.send('window-new', opt)
   }
 
-  function onOpenSpace(event: string, cb: (_event: any, workSapceId: string)=>void) {
-    window.ipcRenderer.on(event, cb)
+  function onOpenSpace(cb: (_event: any, workSapceId: string)=>void) {
+    window.ipcRenderer.on('open-work-space', cb)
   }
-
+  
   return{
     createWindow,
     onOpenSpace

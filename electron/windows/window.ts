@@ -330,7 +330,6 @@ export class window {
     // 动态更新二级菜单
     const openRecent = menu.getMenuItemById('openRecent')
     openRecent.submenu.on('menu-will-show', async () => {
-      console.log('Dynamic Menu will show');
       const newSubMenuItems = await this.fetchSubMenu();
 
       // 移除当前的所有子菜单项
@@ -355,7 +354,7 @@ export class window {
       }
 
       Menu.setApplicationMenu(menu); // 更新菜单
-  });
+    });
     // 设置应用的菜单
     Menu.setApplicationMenu(menu)
 
@@ -386,23 +385,6 @@ export class window {
     };
   }
 
-  async createWorkSapceMenu(){
-      // 创建动态获取的二级菜单
-    const menu = new Menu()
-
-    // 通过异步请求获取二级菜单内容
-    const submenuItems = await this.fetchSubMenu()
-
-    // 根据获取到的子菜单数据创建菜单项
-    submenuItems.forEach(item => {
-    
-    })
-    if(submenuItems.length !== 0){
-      
-    }
-    return menu;
-  }
-
   async fetchSubMenu() {
     try {
       const response = await axios.get('/file/list')
@@ -420,7 +402,7 @@ export class window {
     try {
       const response = await axios.post('/file/open', file_path)
       if(response.status === 200 && response.data.code === 200) {
-
+        
       }
     } catch (error) {
       console.error('Error open file:', error)
