@@ -117,6 +117,8 @@ export class window {
       delete this.group[win.id];
       win.setOpacity(0);
     });
+    ipcMain.handle(`get-window-params-${win.id}`, () => args.data);
+
     if (VITE_DEV_SERVER_URL) {
       win.loadURL(`${VITE_DEV_SERVER_URL}#${args.route}`);
       // Open devTool if the app is not packaged
@@ -231,10 +233,15 @@ export class window {
     ipcMain.on("window-new", (event: IpcMainEvent, args) => {
       this.createWindows(args);
     });
+
+    ipcMain.handle("get-window-id", async () => {
+      const win = BrowserWindow.getFocusedWindow();
+      return win ? win.id : null;
+    });
+    
   }
 
   createTray() {
-    console.log("create tray");
     const contextMenu = Menu.buildFromTemplate([
       {
         label: "注销",

@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, defineProps, watch, reactive } from "vue"
-import { ThreadCount } from "../types";
-import { ThreadStatus } from "../../../types";
+import { nextTick, onMounted, ref, defineProps, watch, reactive, toRaw } from "vue"
+import { ThreadCount } from "./types";
 import * as echarts from 'echarts';
-import useColor from "../hooks/useColor";
-import useIpc from "../../../ipc/useIpc"
-import useChart from "./useChart";
-import { PoolThreads, useDump } from "../../../api/api";
+import useColor from "./hooks/useColor";
+import useIpc from "../../ipc/useIpc"
+import useChart from "./detail/useChart";
+import { PoolThreads, useDump } from "../../api/api";
+import ProcessItem from "./component/ProcessItem.vue";
+import { ThreadStatus } from "../../types";
 
 
 const {listThreadsPool} = useDump()
@@ -139,13 +140,22 @@ const tableColumns = ref([
 ])
 
 
-const { createWindow } = useIpc();
-function openWindow(status: ThreadStatus) {
-  createWindow({ isMainWin: false, route: `/threadDetail?status=${status}` })
+const { createWindow} = useIpc();
+
+
+function openWindow(status: ThreadStatus, ids: string[]) {
+    createWindow({ isMainWin: false, route: `/threadDetail`, data: {
+      file: props.file.file_id,
+      status,
+      ids:toRaw(ids)
+    }})
 };
+
+
 function handleBack(){
   emit('back')
 }
+
 </script>
 
 <template>
@@ -163,7 +173,7 @@ function handleBack(){
             <div :class="[$style.threadNum, $style.textCenter]">{{ item.count }}</div>
             <div :class="[$style.threadStatus, $style.textCenter]">{{ item.status }}</div>
             <div :class="[$style.theadDetail, $style.textCenter, $style.panelNewFooter]" :style="getStyle(item.status)">
-              <span @click="() => openWindow(item.status)">ViewDetail</span>
+              <span @click="() => openWindow(item.status,[])">ViewDetail</span>
             </div>
           </div>
         </div>
@@ -186,7 +196,13 @@ function handleBack(){
               <span>{{ row.count === 1 ? row.source_name :  row.name}}</span>
             </template>
             <template #percent="{ row, index }">
-                <Progress hide-info :success-percent="(row.runnable / row.count) * 100" />
+                <ProcessItem  
+                :runnable="row.runnable" 
+                :waitting="row.waitting"
+                :timeWaitting="row.time_waitting"
+                :blocked="row.block"
+                @open="(status)=>openWindow(status, row.thread_ids)"
+                />
             </template>
           </Table>
         </div>

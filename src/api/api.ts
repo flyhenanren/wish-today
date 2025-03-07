@@ -1,3 +1,4 @@
+import { ThreadStatus } from "../types";
 import { get, post, Response } from "./axios";
 
 export function useApi() {
@@ -25,9 +26,6 @@ export function useDump() {
   function list(workSapceId: string): Promise<Response<DumpInfo[]>> {
     return get<DumpInfo[]>(`${root}/list/${workSapceId}`);
   }
-  function queryDetail(fileName: String) {
-    return post(`${root}/query`, fileName);
-  }
   function countFileStatus(param: StatusQuery): Promise<Response<StatusCount[]>>  {
     return post<StatusCount[]>(`${root}/count_file_status`, param);
   }
@@ -39,11 +37,22 @@ export function useDump() {
   }
   return {
     list,
-    queryDetail,
     countFileStatus,
     countThreadStatus,
     listThreadsPool
   };
+}
+
+
+export function useThread(){
+  const root = "/thread";
+  function queryThreadDetail(query?: ThreadQuery):Promise<Response<ThreadDetail[]>>{
+    return post<ThreadDetail[]>(`${root}/query`, query);
+  }
+
+  return {
+    queryThreadDetail
+  }
 }
 
 export interface DumpInfo {
@@ -80,4 +89,19 @@ export interface PoolThreads{
   waitting: number
   time_waitting: number
   block: number
+  thread_ids: string[]
+}
+
+export type ThreadQuery ={
+  file_id?: string
+  thread_ids?: string[]
+}
+
+export interface ThreadDetail{
+  id: string,
+  name: string,
+  status: ThreadStatus,
+  nid: string,
+  method: string,
+  stack_dep: number,
 }

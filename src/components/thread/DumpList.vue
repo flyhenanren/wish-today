@@ -4,7 +4,7 @@ import type { DataTableColumns, DataTableRowKey, DropdownOption  } from 'naive-u
 import {useMessage} from 'naive-ui'
 import { DumpInfo, useDump } from '../../api/api';
 import DumpCount from './DumpCount.vue';
-import ThreadInfo from './detail/ThreadInfo.vue';
+import ThreadInfo from './ThreadInfo.vue';
 import useIpc from '../../ipc/useIpc';
 const message = useMessage()
 const {onOpenSpace} = useIpc()
