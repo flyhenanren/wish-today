@@ -7,6 +7,8 @@ import 'view-ui-plus/dist/styles/viewuiplus.css'
 import {
   NDataTable,
   NSplit,
+  NDivider,
+  NSpace,
   NDropdown,
   NMessageProvider,
   NPageHeader,
@@ -20,7 +22,7 @@ import './style.css'
 
 
 const naive = create({
-  components: [NDataTable, NSplit,NDropdown,NMessageProvider,NPageHeader]
+  components: [NDataTable, NSplit,NDropdown,NMessageProvider,NPageHeader,NDivider,NSpace]
 })
 
 createApp(App)

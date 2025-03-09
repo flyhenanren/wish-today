@@ -80,28 +80,28 @@ const percentData = ref<{
   data: number[]
 }[]>(
   [{
-    name: ThreadStatus.TIMED_WAITING,
+    name: ThreadStatus.TimedWaiting,
     type: 'line',
     symbol: "none",
     smooth: true,
     data: []
   },
   {
-    name: ThreadStatus.RUNNABLE,
+    name: ThreadStatus.Runnable,
     type: 'line',
     symbol: "none",
     smooth: true,
     data: []
   },
   {
-    name: ThreadStatus.WAITING,
+    name: ThreadStatus.Waiting,
     type: 'line',
     symbol: "none",
     smooth: true,
     data: []
   },
   {
-    name: ThreadStatus.BLOCKED,
+    name: ThreadStatus.Blocked,
     type: 'line',
     symbol: "none",
     smooth: true,
@@ -122,7 +122,7 @@ function drawPercentGraph() {
       trigger: 'axis'
     },
     legend: {
-      data: [ThreadStatus.RUNNABLE, ThreadStatus.TIMED_WAITING, ThreadStatus.WAITING, ThreadStatus.BLOCKED]
+      data: [ThreadStatus.Runnable, ThreadStatus.TimedWaiting, ThreadStatus.Waiting, ThreadStatus.Blocked]
     },
     grid: {
       left: '3%',
@@ -156,7 +156,7 @@ const liveData = ref<{
   data: number[]
 }[]>([
   {
-    name: ThreadStatus.TIMED_WAITING,
+    name: ThreadStatus.TimedWaiting,
     type: 'bar',
     stack: 'total',
     label: {
@@ -168,7 +168,7 @@ const liveData = ref<{
     data: []
   },
   {
-    name: ThreadStatus.RUNNABLE,
+    name: ThreadStatus.Runnable,
     type: 'bar',
     stack: 'total',
     label: {
@@ -180,7 +180,7 @@ const liveData = ref<{
     data: []
   },
   {
-    name: ThreadStatus.WAITING,
+    name: ThreadStatus.Waiting,
     type: 'bar',
     stack: 'total',
     label: {
@@ -192,7 +192,7 @@ const liveData = ref<{
     data: []
   },
   {
-    name: ThreadStatus.BLOCKED,
+    name: ThreadStatus.Blocked,
     type: 'bar',
     stack: 'total',
     label: {

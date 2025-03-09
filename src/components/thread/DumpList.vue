@@ -82,7 +82,10 @@ const columns: DataTableColumns<RowData> = [
   {
     title: '文件名',
     key: 'file_name',
-    className: 'show-text'
+    className: 'show-text',
+    ellipsis: {
+      tooltip: true
+    }
   },
   {
     title: '时间',

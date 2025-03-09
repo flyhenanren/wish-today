@@ -16,13 +16,13 @@ export interface StackTrace {
 }
   
 export enum ThreadStatus {
-    NEW = "NEW",
-    RUNNABLE = "RUNNABLE",
-    TIMED_WAITING = "TIMED_WAITING",
-    WAITING="WAITING",
-    BLOCKED ="BLOCKED",
-    TERMINATED="TERMINATED", 
-    UNKNOWN="UNKNOWN"
+    New = "New",
+    Runnable = "Runnable",
+    TimedWaiting = "TimedWaiting",
+    Waiting="Waiting",
+    Blocked ="Blocked",
+    Terminated="Terminated", 
+    Unknown="Unknown"
 }
 
 // 函数：将字符串转换为枚举

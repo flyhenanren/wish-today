@@ -1,22 +1,22 @@
 import { ThreadStatus } from "../../../types";
 const backgroundColors: Record<ThreadStatus, string> = {
-  [ThreadStatus.RUNNABLE]: "#E5F5F5",
-  [ThreadStatus.TIMED_WAITING]: "#c4daec",
-  [ThreadStatus.WAITING]: "#F6E9DE",
-  [ThreadStatus.BLOCKED]: "#F9DFDE",
-  [ThreadStatus.NEW]: "#FFFFFF",
-  [ThreadStatus.TERMINATED]: "#FFFFFF",
-  [ThreadStatus.UNKNOWN]: "#FFFFFF"
+  [ThreadStatus.Runnable]: "#E5F5F5",
+  [ThreadStatus.TimedWaiting]: "#c4daec",
+  [ThreadStatus.Waiting]: "#F6E9DE",
+  [ThreadStatus.Blocked]: "#F9DFDE",
+  [ThreadStatus.New]: "#FFFFFF",
+  [ThreadStatus.Terminated]: "#FFFFFF",
+  [ThreadStatus.Unknown]: "#FFFFFF"
 };
 
 const foregroundColors: Record<ThreadStatus, string> = {
-  [ThreadStatus.RUNNABLE]: "#00A99D",
-  [ThreadStatus.TIMED_WAITING]: "#337AB7",
-  [ThreadStatus.WAITING]: "#F0AD4E",
-  [ThreadStatus.BLOCKED]: "#D9534F",
-  [ThreadStatus.NEW]: "#000000",
-  [ThreadStatus.TERMINATED]: "#000000",
-  [ThreadStatus.UNKNOWN]: "#000000"
+  [ThreadStatus.Runnable]: "#00A99D",
+  [ThreadStatus.TimedWaiting]: "#337AB7",
+  [ThreadStatus.Waiting]: "#F0AD4E",
+  [ThreadStatus.Blocked]: "#D9534F",
+  [ThreadStatus.New]: "#000000",
+  [ThreadStatus.Terminated]: "#000000",
+  [ThreadStatus.Unknown]: "#000000"
 };
 
 export default function () {

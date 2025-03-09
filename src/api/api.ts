@@ -50,8 +50,14 @@ export function useThread(){
     return post<ThreadDetail[]>(`${root}/query`, query);
   }
 
+  function getContent(threadId?: string):Promise<Response<ThreadContent>>{
+    return get<ThreadContent>(`${root}/content/${threadId}`);
+  }
+
+
   return {
-    queryThreadDetail
+    queryThreadDetail,
+    getContent
   }
 }
 
@@ -94,6 +100,7 @@ export interface PoolThreads{
 
 export type ThreadQuery ={
   file_id?: string
+  status?: string
   thread_ids?: string[]
 }
 
@@ -104,4 +111,11 @@ export interface ThreadDetail{
   nid: string,
   method: string,
   stack_dep: number,
+}
+
+export interface ThreadContent{
+  id: string,
+  name: string,
+  status: ThreadStatus,
+  content: string[]
 }

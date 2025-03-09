@@ -29,10 +29,10 @@ const props = defineProps<IProps>()
 
 const emit = defineEmits(["open"])
 const statuses = [
-  ThreadStatus.RUNNABLE,
-  ThreadStatus.WAITING,
-  ThreadStatus.TIMED_WAITING,
-  ThreadStatus.BLOCKED,
+  ThreadStatus.Runnable,
+  ThreadStatus.Waiting,
+  ThreadStatus.TimedWaiting,
+  ThreadStatus.Blocked,
 ];
 const isHovered = ref<ThreadStatus | null>(null);
 const hoverStyle = {
@@ -47,25 +47,25 @@ const { getBackground } = useColor()
 
 function getPercentage(type: ThreadStatus) {
   const percentages = {
-    [ThreadStatus.RUNNABLE]: props.runnable,
-    [ThreadStatus.WAITING]: props.waitting,
-    [ThreadStatus.TIMED_WAITING]: props.timeWaitting,
-    [ThreadStatus.BLOCKED]: props.blocked,
-    [ThreadStatus.NEW]: 0,
-    [ThreadStatus.UNKNOWN]: 0,
-    [ThreadStatus.TERMINATED]: 0
+    [ThreadStatus.Runnable]: props.runnable,
+    [ThreadStatus.Waiting]: props.waitting,
+    [ThreadStatus.TimedWaiting]: props.timeWaitting,
+    [ThreadStatus.Blocked]: props.blocked,
+    [ThreadStatus.New]: 0,
+    [ThreadStatus.Unknown]: 0,
+    [ThreadStatus.Terminated]: 0
   }
   return (percentages[type] / total.value) * 100
 }
 function segmentStyles(type: ThreadStatus) {
   const percentages = {
-    [ThreadStatus.RUNNABLE]: props.runnable,
-    [ThreadStatus.WAITING]: props.waitting,
-    [ThreadStatus.TIMED_WAITING]: props.timeWaitting,
-    [ThreadStatus.BLOCKED]: props.blocked,
-    [ThreadStatus.NEW]: 0,
-    [ThreadStatus.UNKNOWN]: 0,
-    [ThreadStatus.TERMINATED]: 0
+    [ThreadStatus.Runnable]: props.runnable,
+    [ThreadStatus.Waiting]: props.waitting,
+    [ThreadStatus.TimedWaiting]: props.timeWaitting,
+    [ThreadStatus.Blocked]: props.blocked,
+    [ThreadStatus.New]: 0,
+    [ThreadStatus.Unknown]: 0,
+    [ThreadStatus.Terminated]: 0
   }
   return {
     width: `${(percentages[type] / total.value) * 100}%`,

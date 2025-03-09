@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, defineProps, watch, reactive, toRaw } from "vue"
+import { ref, defineProps, watch, reactive, toRaw } from "vue"
 import { ThreadCount } from "./types";
 import * as echarts from 'echarts';
 import useColor from "./hooks/useColor";
@@ -38,22 +38,22 @@ function queryData(){
 
 const runnable = {
   count: 0,
-  status: ThreadStatus.RUNNABLE,
+  status: ThreadStatus.Runnable,
   icon: 'ios-cog'
 }
 const timedWaiting = {
   count: 0,
-  status: ThreadStatus.TIMED_WAITING,
+  status: ThreadStatus.TimedWaiting,
   icon: 'ios-time'
 }
 const waiting = {
   count: 0,
-  status: ThreadStatus.WAITING,
+  status: ThreadStatus.Waiting,
   icon: 'ios-pause'
 }
 const blocked = {
   count: 0,
-  status: ThreadStatus.BLOCKED,
+  status: ThreadStatus.Blocked,
   icon: 'ios-lock'
 }
 
