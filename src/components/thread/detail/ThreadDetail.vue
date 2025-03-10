@@ -42,13 +42,18 @@ const columns: DataTableColumns<RowData> = [
     {
         title: '线程',
         key: 'name',
-        resizable: true
+        resizable: true,
+        defaultSortOrder: 'ascend',
+        sorter: 'default'
     },
     {
         title: '状态',
         key: 'status',
-        width: 100,
-        resizable: true
+        className: 'show-status',
+        width: 150,
+        resizable: true,
+        defaultSortOrder: 'ascend',
+        sorter: 'default'
     },
     {
         title: 'Native ID',
@@ -65,7 +70,8 @@ const columns: DataTableColumns<RowData> = [
     {
         title: '栈深',
         key: 'statckDepth',
-        width: 60
+        width: 80,
+        sorter: (row1, row2) => row1.statckDepth - row2.statckDepth
     }
 ]
 
@@ -93,6 +99,19 @@ function buildRowData(data: ThreadDetail[]){
   })
 }
 
+function rowClassName(row: RowData) {
+    if (row.status === ThreadStatus.Runnable){
+      return 'thread-status-runnable'
+    }else if(row.status === ThreadStatus.Waiting){
+        return 'thread-status-waitting'
+    }else if(row.status === ThreadStatus.TimedWaiting){
+        return 'thread-status-timedwaitting'
+    }else if(row.status === ThreadStatus.Blocked){
+        return 'thread-status-blocked'
+    }
+    return ''
+}
+
 const threadName =  ref<string>('')
 const threadStatus = ref<ThreadStatus>()
 
@@ -114,10 +133,10 @@ function selectThread(row: RowData){
       <template #left>
         <div class="thread-pannel">
           <n-data-table 
-            virtual-scroll
             size="small"
             :max-height="800"
              :row-props="rowProps"
+             :row-class-name="rowClassName"
             :columns="columns" :data="tableData" :row-key="rowKey" />
         </div>
       </template>
@@ -164,5 +183,20 @@ function selectThread(row: RowData){
 .content-container{
   display: flex;
   flex-direction: column;
+}
+</style>
+
+<style>
+.thread-status-runnable  .show-status{
+  color: #00A99D;
+}
+.thread-status-waitting  .show-status{
+  color: #F0AD4E;
+}
+.thread-status-timedwaitting  .show-status{
+  color: #337AB7;
+}
+.thread-status-blocked  .show-status{
+  color: #D9534F;
 }
 </style>

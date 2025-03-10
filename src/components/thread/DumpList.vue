@@ -7,7 +7,7 @@ import DumpCount from './DumpCount.vue';
 import ThreadInfo from './ThreadInfo.vue';
 import useIpc from '../../ipc/useIpc';
 const message = useMessage()
-const {onOpenSpace} = useIpc()
+const {onOpenSpace, createWindow} = useIpc()
 
 const splitMin = ref(0.3)
 const splitMax = ref(0.6)
@@ -179,8 +179,16 @@ const yRef = ref(0)
 function onClickoutside() {
   showDropdownRef.value = false
 }
-function handleSelect(item: DropdownOption) {
+function handleSelect(item: string) {
   showDropdownRef.value = false
+  switch(item){
+    case 'threadDetail':{
+      createWindow({ isMainWin: false, route: `/threadDetail`, data: {
+            file: currentFile.value?.file_id
+        }})
+      break;
+    }
+  }
 }
 
 </script>
