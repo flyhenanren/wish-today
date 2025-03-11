@@ -20,6 +20,7 @@ import SummaryView from '../components/summary'
 import ErrorView from '../view/Error.vue'
 import AboutView from '../view/About.vue'
 import HomeView from '../view/Home.vue'
+import Setting from '../view/setting/SystemSetting.vue'
 
 
 const routes = [
@@ -47,6 +48,7 @@ const routes = [
   { path: '/threadDetail', name:'threadDetail',component: ThreadDetail },
   { path: '/about', name:'about',component: AboutView },
   { path: '/error', name:'error',component: ErrorView },
+  { path: '/setting', name:'setting',component: Setting },
 ]
 
 const router = createRouter({

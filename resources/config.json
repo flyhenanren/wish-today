@@ -1,0 +1,13 @@
+{
+  "preference": {
+    "storage": "db",
+    "exit": "exit"
+  },
+  "threadConfig": {
+    "countSize": 10
+  },
+  "fileConfig": {
+    "fileName": "full"
+  }
+  
+}

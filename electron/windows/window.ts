@@ -5,19 +5,17 @@ import {
   ipcMain,
   Menu,
   Tray,
-  dialog,
-  IpcMainEvent,
-  MenuItem,
+  screen,
+  IpcMainEvent
 } from "electron";
-import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import os from "node:os";
 import path from "node:path";
 import { IGroup, IWindowOpt, windowsCfg } from "./types";
+import MenuBuilder from "../menu/menu";
+import { isMainFrame } from "node:process";
+import useConfig from "../config";
 
-const require = createRequire(import.meta.url);
-const axios = require("axios"); // 用于发送 HTTP 请求
-axios.defaults.baseURL = import.meta.env.VITE_API_DOMAIN;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 process.env.APP_ROOT = path.join(__dirname, "../..");
@@ -46,6 +44,9 @@ if (!app.requestSingleInstanceLock()) {
 
 const preload = path.join(__dirname, "../preload/index.mjs");
 const indexHtml = path.join(RENDERER_DIST, "index.html");
+
+
+const {readSetting, writeSetting} = useConfig()
 
 export class window {
   main: BrowserWindow | null | undefined;
@@ -86,8 +87,10 @@ export class window {
       console.log("current main window");
     } // 还可以继续做其它判断
     // 根据传入配置项，修改窗口的相关参数
+    opt.title= args.title
     opt.modal = args.modal;
     opt.resizable = args.resizable; // 窗口是否可缩放
+    opt.alwaysOnTop = args.alwaysOnTop
     if (args.backgroundColor) opt.backgroundColor = args.backgroundColor; // 窗口背景色
     if (args.minWidth) opt.minWidth = args.minWidth;
     if (args.minHeight) opt.minHeight = args.minHeight;
@@ -99,10 +102,7 @@ export class window {
       route: args.route,
       isMultiWindow: args.isMultiWindow,
     };
-    // 是否最大化
-    if (args.maximize && args.resizable) {
-      win.maximize();
-    }
+    
     // 是否主窗口
     if (args.isMainWin) {
       if (this.main) {
@@ -150,10 +150,31 @@ export class window {
       return { action: "deny" };
     });
     // win.webContents.on('will-navigate', (event, url) => { }) #344
-    win.maximize();
-
+    // 是否最大化
+    if (args.isMainWin) {
+      win.maximize();
+    }
+    // TODO: 窗口大小计算
+    // const primaryDisplay = screen.getPrimaryDisplay();
+    // const { width, height } = primaryDisplay.workAreaSize; // 屏幕可用大小
+    // const scaleFactor = primaryDisplay.scaleFactor; // DPI 缩放
+  
+    // // 计算合适的窗口大小（占比屏幕大小）
+    // const winWidth = Math.round(width * 0.4 / scaleFactor); // 40% 屏幕宽度
+    // const winHeight = Math.round(height * 0.6 / scaleFactor); // 60% 屏幕高度
+    
     win.once("ready-to-show", () => {
       win.show();
+    });
+
+    if(args.alwaysOnTop){
+      this.main.setEnabled(false); // 禁用主界面
+    }
+    // 监听设置窗口的关闭事件，启用主窗口交互
+    win.on('closed', () => {
+      if (this.main) {
+        this.main.setEnabled(true); // 启用主界面
+      }
     });
     // startServer();
     return win;
@@ -243,17 +264,58 @@ export class window {
       this.createWindows(args);
     });
 
+     // 打开配置信息窗口
+     ipcMain.on("setting", (args) => {
+      this.createWindows({ 
+        title:'设置',
+        width: 800,
+        height:500,
+        minWidth: 800,  // 确保最小宽度
+        minHeight: 500, // 确保最小高度
+        modal: true,
+        isMainWin: false, 
+        resizable: false,
+        maximize: false,
+        route: `/setting`, 
+        alwaysOnTop: true});
+    });
+
+    ipcMain.on("about", ()=>{
+      this.createWindows({ 
+        title:'关于',
+        width: 500,
+        height:300,
+        minWidth: 500,  // 确保最小宽度
+        minHeight: 300, // 确保最小高度
+        modal: true,
+        isMainWin: false, 
+        resizable: false,
+        maximize: false,
+        route: `/about`, 
+        alwaysOnTop: true});
+    });
+
     ipcMain.handle("get-window-id", async () => {
       const win = BrowserWindow.getFocusedWindow();
       return win ? win.id : null;
     });
 
+    const builder = new MenuBuilder()
+    
     ipcMain.on("refresh-menu", async () => {
-      const menu = this.buildMenuTemplate();
-      this.syncRecentMenu(menu)
+      const menu = builder.buildMenuTemplate(this.main);
+      builder.syncRecentMenu(this.main, menu)
       Menu.setApplicationMenu(menu)
     });
-    
+
+    ipcMain.handle("load-config", async () => {
+      return readSetting()
+    });
+
+    ipcMain.handle("save-config", (event: IpcMainEvent, args) => {
+      writeSetting(args)
+    });
+
   }
 
   createTray() {
@@ -289,120 +351,17 @@ export class window {
   }
 
   async createMenu() {
+    const builder = new MenuBuilder()
     // 设置应用的菜单
-    const menu = this.buildMenuTemplate();
-    this.syncRecentMenu(menu)
+    const menu = builder.buildMenuTemplate(this.main);
+    builder.syncRecentMenu(this.main, menu)
     Menu.setApplicationMenu(menu)
   }
-
-  buildMenuTemplate() {
-    // 创建主菜单
-    const menu = new Menu();
-
-    // 创建第一级菜单
-    const fileMenu = new Menu();
-
-    fileMenu.append(
-      new MenuItem({
-        label: "打开文件",
-        accelerator: "ctrl+o",
-        click: () => {
-          dialog
-            .showOpenDialog({
-              title: "选择压缩包",
-            })
-            .then((result) => {
-              if (!result.canceled) {
-                this.openFile(result.filePaths[0]);
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        },
-      })
-    );
-
-    fileMenu.append(
-      new MenuItem({ id: "openRecent", label: "打开最近的文件", submenu: [] })
-    );
-
-    let newWindow: BrowserWindow | null = null;
-    fileMenu.append(
-      new MenuItem({
-        label: "新建窗口",
-        accelerator: "ctrl+shift+n",
-        click: () => {
-          //绑定事件
-          newWindow = new BrowserWindow({
-            width: 500,
-            height: 300,
-            //主题渲染内容
-            webPreferences: {
-              nodeIntegration: true, //集成node环境
-            },
-          });
-          newWindow.loadFile("index.html");
-          newWindow.on("closed", () => {
-            newWindow = null;
-          });
-        },
-      })
-    );
-
-    const viewMenu = new Menu();
-    const cpuMenu = new Menu();
-    const memoryMenu = new Menu();
-    const helpMenu = new Menu();
-
-    // 将二级菜单添加到主菜单
-    menu.append(new MenuItem({ label: "文件", submenu: fileMenu }));
-    menu.append(new MenuItem({ label: "视图", submenu: viewMenu }));
-    menu.append(new MenuItem({ label: "cpu", submenu: cpuMenu }));
-    menu.append(new MenuItem({ label: "memory", submenu: memoryMenu }));
-    menu.append(new MenuItem({ label: "帮助", submenu: helpMenu }));
-    return menu;
-  }
-
-  async syncRecentMenu(menu: Electron.Menu) {
-    const openRecent = menu.getMenuItemById("openRecent");
-    const newSubMenuItems = await this.fetchSubMenu();
-
-    // 移除当前的所有子菜单项
-    if (openRecent.submenu.items.length > 0) {
-      openRecent.submenu.items.splice(0, openRecent.submenu.items.length);
-    }
-
-    // 添加新的二级菜单项
-    newSubMenuItems.forEach((item) => {
-      openRecent.submenu.append(
-        new MenuItem({
-          label: item.file_path,
-          click: () => {
-            this.main.webContents.send("open-work-space", item);
-          },
-        })
-      );
-    });
-
-    if (newSubMenuItems.length !== 0) {
-      openRecent.submenu.append(new MenuItem({ type: "separator" }));
-      openRecent.submenu.append(
-        new MenuItem({
-          label: "清空最近的文件",
-          click: () => {
-            this.cleanSubMenu().then(() => {
-              this.main.webContents.send("clean-work-space");
-            });
-          },
-        })
-      );
-    }
-    Menu.setApplicationMenu(menu); // 更新菜单
-  }
+ 
   // 窗口配置
   defaultOption(wh: Array<number> = []): IWindowOpt {
     return {
+      title: '',
       width: wh[0],
       height: wh[1],
       backgroundColor: "#f7f8fc",
@@ -416,6 +375,7 @@ export class window {
       minWidth: 0,
       minHeight: 0,
       modal: true,
+      alwaysOnTop: false,
       webPreferences: {
         // contextIsolation: false, //上下文隔离
         // nodeIntegration: true, //启用 Node 集成（是否完整的支持 node）
@@ -423,42 +383,5 @@ export class window {
         preload: preload,
       },
     };
-  }
-
-  async fetchSubMenu() {
-    try {
-      const response = await axios.get("/file/list");
-      if (response.data.code === 200) {
-        return response.data.data;
-      }
-      return []; // 假设返回的数据是一个数组
-    } catch (error) {
-      console.error("Error fetching submenu:", error);
-      return [];
-    }
-  }
-
-  async openFile(file_path: string) {
-    try {
-      const response = await axios.post("/file/open", file_path);
-      if (response.status === 200 && response.data.code === 200) {
-        this.main.webContents.send("open-file", response.data.data);
-      }
-    } catch (error) {
-      console.error("Error open file:", error);
-    }
-  }
-
-  async cleanSubMenu() {
-    try {
-      const response = await axios.get("/file/clean");
-      if (response.data.code === 200) {
-        return response.data.data;
-      }
-      return []; // 假设返回的数据是一个数组
-    } catch (error) {
-      console.error("Error fetching submenu:", error);
-      return [];
-    }
   }
 }

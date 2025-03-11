@@ -6,7 +6,7 @@ const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const { spawn } = require('child_process');
 
-console.log("rootpaht:" + __dirname)
+console.log("rootpth:" + __dirname)
 const resolveBuildResourcesPath = (pathData:string) => {
   return import.meta.env.MODE === "development" 
   ? path.resolve(__dirname,`../../resources/${pathData}`) 

@@ -17,8 +17,10 @@ export interface IWindowsCfg {
   isMainWin: boolean; // 是否为主窗口
   parentId: number | null; //父窗口ID
   modal: boolean; // 模态窗口，禁用父窗口
+  alwaysOnTop: boolean 
 }
 export interface IWindowOpt {
+  title:string
   width: number;
   height: number;
   icon: string;
@@ -33,6 +35,7 @@ export interface IWindowOpt {
   minWidth: number;
   minHeight: number;
   modal: boolean;
+  alwaysOnTop: boolean, // 确保设置窗口在最上层
   webPreferences: {
     contextIsolation?: boolean; //上下文隔离
     nodeIntegration?: boolean; //启用 Node 集成（是否完整的支持 node）
@@ -59,6 +62,7 @@ export const windowsCfg: IWindowsCfg = {
   isMainWin: false, //是否主窗口(当为 true 时会替代当前主窗口)
   parentId: null, //父窗口 id  创建父子窗口 -- 子窗口永远显示在父窗口顶部 【父窗口可以操作】
   modal: false, //模态窗口 -- 模态窗口是禁用父窗口的子窗口，创建模态窗口必须设置 parent 和 modal 选项 【父窗口不能操作】
+  alwaysOnTop: false
 };
 // 窗口组
 export interface IGroup {

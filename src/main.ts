@@ -15,6 +15,16 @@ import {
   NModal,
   NCard,
   NProgress,
+  NLayout,
+  NLayoutSider,
+  NLayoutFooter,
+  NButton,
+  NSelect,
+  NForm,
+  NFormItem,
+  NRadio,
+  NRadioGroup,
+  NMenu,
   create
 } from 'naive-ui'
 
@@ -25,7 +35,7 @@ import './style.css'
 
 
 const naive = create({
-  components: [NDataTable, NSplit,NDropdown,NMessageProvider,NPageHeader,NDivider,NSpace,NModal,NCard,NProgress]
+  components: [NDataTable,NRadio,NRadioGroup, NButton,NForm,NFormItem, NSplit,NDropdown,NSelect, NMessageProvider,NPageHeader,NDivider,NSpace,NModal,NCard,NProgress,NMenu,NLayout,NLayoutSider,NLayoutFooter]
 })
 
 createApp(App)

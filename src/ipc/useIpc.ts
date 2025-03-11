@@ -20,6 +20,9 @@ export default function () {
     window.ipcRenderer.on('open-file', cb)
   }
 
+  function cleanWorkSpace(cb: (_event: any)=>void) {
+    window.ipcRenderer.on('clean-work-space', cb)
+  }
 
   function getWinId(){
     return window.ipcRenderer.invoke("get-window-id")
@@ -29,13 +32,22 @@ export default function () {
     window.ipcRenderer.send('refresh-menu')
   }
   
+  function loadConfig(){
+      return window.ipcRenderer.invoke("load-config")
+  }
+  function saveConfig(config: any){
+    return window.ipcRenderer.send("save-config", config)
+}
   return{
     createWindow,
     onOpenSpace,
     getData,
     getWinId,
     onOpenFile,
-    refreshMenu
+    refreshMenu,
+    cleanWorkSpace,
+    loadConfig,
+    saveConfig
   }
 
 }
