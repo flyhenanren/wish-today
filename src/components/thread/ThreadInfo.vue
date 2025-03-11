@@ -78,7 +78,7 @@ function buildRow(rows: PoolThreads[]) {
     timedWaiting.count += e.time_waitting
     waiting.count += e.waitting
     blocked.count += e.block
-    threadTotal.value += 1
+    threadTotal.value += e.count
     threadPoolData.push({
       value: e.count,
       name: e.count === 1 ? e.source_name : e.name

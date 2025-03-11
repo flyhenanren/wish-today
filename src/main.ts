@@ -12,6 +12,9 @@ import {
   NDropdown,
   NMessageProvider,
   NPageHeader,
+  NModal,
+  NCard,
+  NProgress,
   create
 } from 'naive-ui'
 
@@ -22,7 +25,7 @@ import './style.css'
 
 
 const naive = create({
-  components: [NDataTable, NSplit,NDropdown,NMessageProvider,NPageHeader,NDivider,NSpace]
+  components: [NDataTable, NSplit,NDropdown,NMessageProvider,NPageHeader,NDivider,NSpace,NModal,NCard,NProgress]
 })
 
 createApp(App)

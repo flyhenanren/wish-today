@@ -61,6 +61,16 @@ export function useThread(){
   }
 }
 
+export function useTask(){
+  const root = 'task'
+  function queryProcess(task_id: string): Promise<Response<TaskStatus>>{
+    return get<TaskStatus>(`${root}/query_process/${task_id}`);
+  }
+  return {
+    queryProcess
+  }
+}
+
 export interface DumpInfo {
   file_id: string;
   block_threads: number;
@@ -118,4 +128,12 @@ export interface ThreadContent{
   name: string,
   status: ThreadStatus,
   content: string[]
+}
+
+
+export interface TaskStatus{
+  progress: number,
+  message: string,
+  phase: string
+  result: string
 }

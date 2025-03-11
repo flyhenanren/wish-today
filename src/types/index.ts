@@ -1,4 +1,4 @@
-import { S } from "vite/dist/node/types.d-aGj9QkWt";
+import Bus from "../bus/bus"
 
 export interface Sheet{
     key: string
@@ -40,3 +40,7 @@ export interface Thread {
     status:  ThreadStatus
     waitting?: string
 }  
+
+export interface IGlobalProvider{
+    bus: Bus
+}

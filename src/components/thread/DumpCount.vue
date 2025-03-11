@@ -16,8 +16,8 @@ const startTime = ref<string>("1970-01-01 00:00:00")
 const endTime = ref<string>("9999-12-31 23:59:59")
 watch(() => props.selected,
   (value) => {
-    // initCountInfo(value)
-    // initThreadStatus(value)
+    initCountInfo(value)
+    initThreadStatus(value)
   },
   { deep: true})
 
@@ -37,7 +37,7 @@ function initThreadStatus(rows: DumpInfo[]) {
   }
   dumpApi.countThreadStatus(queryParam).then((resp: Response<StatusCount[]>) => {
     if (resp.code === 200) {
-      buildThreadStatus(resp.data)
+      buildThreadStatus(resp.data.slice(0,10))
       drawLiveGraph()
     }
   })

@@ -1,13 +1,20 @@
 <script setup lang="ts">
-import { h, nextTick, shallowRef, ref, watch } from 'vue'
+import { h, nextTick, shallowRef, ref, watch, inject } from 'vue'
 import type { DataTableColumns, DataTableRowKey, DropdownOption  } from 'naive-ui'
 import {useMessage} from 'naive-ui'
 import { DumpInfo, useDump } from '../../api/api';
 import DumpCount from './DumpCount.vue';
 import ThreadInfo from './ThreadInfo.vue';
 import useIpc from '../../ipc/useIpc';
+import { IGlobalProvider } from '../../types';
 const message = useMessage()
 const {onOpenSpace, createWindow} = useIpc()
+
+const provider = inject<IGlobalProvider>('globalProvider')
+
+provider?.bus.on('openSpace', (workSpaceId)=>{
+  openSpace(workSpaceId)
+})
 
 const splitMin = ref(0.3)
 const splitMax = ref(0.6)
@@ -41,17 +48,24 @@ function closeDetail() {
 }
 
 onOpenSpace((_event: any, arg: any) => {
-  useFileApi.list(arg.id).then((resp) => {
+  openSpace(arg.id)
+})
+
+function openSpace(id: string){
+  useFileApi.list(id).then((resp) => {
     if(resp.code === 200){
       buildRows(resp.data)
     }else{
       message.error(resp.message!)
     }
   })
-})
+}
 
+const checkedRowKeys = ref<string[]>([])
+const data = ref<RowData[]>([])
 function buildRows(resp: DumpInfo[]) {
   selectedRows.value = []
+  data.value = []
   resp.forEach(e =>{
     data.value.push({
       file_id: e.file_id,
@@ -73,7 +87,7 @@ interface RowData {
   block_threads: number
 }
 
-const data = ref<RowData[]>([])
+
 
 const columns: DataTableColumns<RowData> = [
   {
@@ -110,7 +124,7 @@ const columns: DataTableColumns<RowData> = [
 function rowProps(row: RowData) {
   return {
     style: 'cursor: pointer;',
-    onClick: () => {
+    onDblclick: () => {
       selectedFile(row)
     },
     onContextmenu: (e: MouseEvent) => {
@@ -136,7 +150,7 @@ function selectedFile(file: RowData) {
 function handleCheck(rowKeys: DataTableRowKey[]) {
 
 }
-const checkedRowKeys = ref<string[]>([])
+
 
 function rowClassName(row: RowData) {
     if (row.file_id === currentFile.value?.file_id){
