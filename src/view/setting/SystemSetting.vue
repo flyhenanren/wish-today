@@ -4,25 +4,25 @@ import FileView from './File.vue'
 import PreferenceView from './Preference.vue'
 import StyleView from './Style.vue'
 import ThreadView from './Thread.vue'
+import CpuView from './Cpu.vue'
+import MemeoryView from './Memeory.vue'
 import useIpc from '../../ipc/useIpc'
 import { Setting, StyleConfig } from '../../../electron/config'
 
-const {loadConfig, saveConfig} = useIpc()
+const { loadConfig, saveConfig } = useIpc()
 
 interface IConfig {
   setting: Setting,
   style: StyleConfig
 }
 const setting = ref<IConfig>()
-onMounted(()=>{
-  loadConfig().then(resp =>{
+onMounted(() => {
+  loadConfig().then(resp => {
     setting.value = resp
-    selectMenu.value = 'preference'
     onSelectMenu('preference')
   })
 })
 
-const selectMenu = ref()
 const currentComponent = shallowRef()
 const config = ref()
 
@@ -40,28 +40,44 @@ const menuOptions = ref([
     key: 'file'
   },
   {
+    label: 'CPU',
+    key: 'cpu'
+  },
+  {
     label: '线程',
     key: 'thread'
+  },
+  {
+    label: '内存',
+    key: 'mem'
   }
 ])
 
 function onSelectMenu(item: string) {
   switch (item) {
     case 'preference':
-    currentComponent.value = PreferenceView
-    config.value = setting.value?.setting.preference
+      currentComponent.value = PreferenceView
+      config.value = setting.value?.setting.preference
       break;
     case 'style':
-    currentComponent.value = StyleView
-    config.value = setting.value?.style
+      currentComponent.value = StyleView
+      config.value = setting.value?.style
       break;
     case 'file':
-    currentComponent.value = FileView
-    config.value = setting.value?.setting.fileConfig
+      currentComponent.value = FileView
+      config.value = setting.value?.setting.fileConfig
       break;
     case 'thread':
-    currentComponent.value = ThreadView
-    config.value = setting.value?.setting.threadConfig
+      currentComponent.value = ThreadView
+      config.value = setting.value?.setting.threadConfig
+      break;
+    case 'cpu':
+      currentComponent.value = CpuView
+      config.value = setting.value?.setting.threadConfig
+      break;
+    case 'mem':
+      currentComponent.value = MemeoryView
+      config.value = setting.value?.setting.threadConfig
       break;
   }
 }
@@ -69,9 +85,9 @@ function onSelectMenu(item: string) {
 
 <template>
   <div class="setting-container">
-    <n-layout has-sider style="widows: 100%;height: 100%;">
+    <n-layout has-sider style="width: 100%;height: 100%;">
       <n-layout-sider bordered collapse-mode="width" :width="100" :collapsed="false">
-        <n-menu :value="selectMenu" :collapsed="false" :options="menuOptions" :on-update:value="onSelectMenu" />
+        <n-menu default-value="preference" :collapsed="false" :options="menuOptions" :on-update:value="onSelectMenu" />
       </n-layout-sider>
       <n-layout>
         <div class="setting-content">
@@ -84,7 +100,6 @@ function onSelectMenu(item: string) {
           </div>
         </n-layout-footer>
       </n-layout>
-
     </n-layout>
   </div>
 
@@ -95,7 +110,8 @@ function onSelectMenu(item: string) {
   width: 100%;
   height: 100%;
 }
-.setting-content{
+
+.setting-content {
   padding: 10px 10px;
 }
 </style>

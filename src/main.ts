@@ -6,6 +6,9 @@ import 'view-ui-plus/dist/styles/viewuiplus.css'
 
 import {
   NDataTable,
+  NInput,
+  NSwitch,
+  NInputNumber,
   NSplit,
   NDivider,
   NSpace,
@@ -25,6 +28,7 @@ import {
   NRadio,
   NRadioGroup,
   NMenu,
+  NColorPicker,
   create
 } from 'naive-ui'
 
@@ -35,7 +39,7 @@ import './style.css'
 
 
 const naive = create({
-  components: [NDataTable,NRadio,NRadioGroup, NButton,NForm,NFormItem, NSplit,NDropdown,NSelect, NMessageProvider,NPageHeader,NDivider,NSpace,NModal,NCard,NProgress,NMenu,NLayout,NLayoutSider,NLayoutFooter]
+  components: [NDataTable,NInput,NSwitch, NColorPicker, NInputNumber, NRadio,NRadioGroup, NButton,NForm,NFormItem, NSplit,NDropdown,NSelect, NMessageProvider,NPageHeader,NDivider,NSpace,NModal,NCard,NProgress,NMenu,NLayout,NLayoutSider,NLayoutFooter]
 })
 
 createApp(App)

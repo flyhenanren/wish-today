@@ -3,7 +3,8 @@ import { ref } from 'vue'
 
 interface IProps {
   modelValue: {
-    storage: 'db' | 'file' | 'mem'
+    storage: 'db' | 'file' | 'mem',
+    singleFile: false,
     exit: 'exit'
   }
 }
@@ -35,6 +36,9 @@ const storageOption = [
     <n-form ref="formRef"   label-width="auto" label-placement="left" :model="fileConfig">
       <n-form-item label="存储模式">
         <n-select v-model:value="fileConfig.storage" disabled :options="storageOption" style="width: 150px;"/>
+      </n-form-item>
+      <n-form-item label="单文件模式">
+        <n-switch v-model:value="fileConfig.singleFile" />
       </n-form-item>
       <n-form-item label="退出确认">
         <n-radio-group v-model:value="fileConfig.exit" name="radiogroup" disabled>
