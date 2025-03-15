@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 
 import useSheet from '../hook/useSheet';
+import { onMounted, ref } from 'vue';
 
 const {sheets} = useSheet()
 
@@ -22,11 +23,14 @@ function handleClickTab(name: string) {
     router.push({name: find.route})
   }
 }
-
+const rootRef = ref()
+onMounted(()=> {
+  console.log(rootRef.value.height, rootRef.value.height) 
+})
 </script>
 
 <template>
-  <div :class="$style.rootContainer">
+  <div :class="$style.rootContainer" ref="rootRef">
     <Tabs type="card"  closable  draggable
     v-model="currentSheet"
     @on-tab-remove="handleTabRemove"

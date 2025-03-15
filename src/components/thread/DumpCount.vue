@@ -258,8 +258,9 @@ function drawLiveGraph() {
 </template>
 
 <style scoped>
-.dump-list {
-  /* padding: 10px; */
+.dump-count-container{
+  display: flex;
+  flex-direction: column;
 }
 
 .dump-live-container {

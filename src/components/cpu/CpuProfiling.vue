@@ -11,9 +11,6 @@ const splitMax = ref('300px')
 const cpuChart = ref(null);
 let cpuGraph:any = null;
 
-const threadsChart = ref(null);
-let threadsGraph:any = null;
-
 onMounted(() => {
   nextTick(()=> {
     cpuGraph = echarts.init(cpuChart.value)
@@ -39,30 +36,6 @@ onMounted(() => {
       series: cpuData
     }
     cpuGraph.setOption(cpuOption);
-
-
-    threadsGraph = echarts.init(threadsChart.value)
-    const threadsOption = {
-      title: {
-        text: 'Threads'
-      },
-      dataZoom:{
-        type:'slider'
-      },
-      tooltip: {
-        trigger: 'axis'
-      },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: xAxis
-      },
-      yAxis: {
-        type: 'value'
-      },
-      series: threadData
-    }
-    threadsGraph.setOption(threadsOption);
   })
 })
 
@@ -70,10 +43,6 @@ onMounted(() => {
 onUnmounted(() => {
   if (cpuGraph != null && cpuGraph.dispose) {
     cpuGraph.dispose();
-  }
-
-  if (threadsGraph != null && threadsGraph.dispose) {
-    threadsGraph.dispose();
   }
 })
 
@@ -84,8 +53,7 @@ onUnmounted(() => {
     <Split v-model="split" mode="vertical" :min="splitMin" :max="splitMax">
             <template #top>
                 <div style="display: flex;justify-content: space-between;">
-                  <div ref="cpuChart" style="width: 500px; height: 250px;"></div>
-                  <div ref="threadsChart" style="width: 500px; height: 250px;"></div>
+                  <div ref="cpuChart" style="width: 800px; height: 250px;"></div>
                 </div>
             </template>
             <template #bottom>

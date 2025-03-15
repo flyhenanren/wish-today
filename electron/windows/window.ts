@@ -155,10 +155,11 @@ export class window {
       win.maximize();
     }
     // TODO: 窗口大小计算
-    // const primaryDisplay = screen.getPrimaryDisplay();
-    // const { width, height } = primaryDisplay.workAreaSize; // 屏幕可用大小
-    // const scaleFactor = primaryDisplay.scaleFactor; // DPI 缩放
-  
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width, height } = primaryDisplay.workAreaSize; // 屏幕可用大小
+    
+    const scaleFactor = primaryDisplay.scaleFactor; // DPI 缩放
+    console.log(width, height, scaleFactor)
     // // 计算合适的窗口大小（占比屏幕大小）
     // const winWidth = Math.round(width * 0.4 / scaleFactor); // 40% 屏幕宽度
     // const winHeight = Math.round(height * 0.6 / scaleFactor); // 60% 屏幕高度
