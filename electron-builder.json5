@@ -21,7 +21,6 @@
       from:"resources/style.json",
       to:".style",
     },
-    ,
     {
       from:"resources/config.json",
       to:".config",
