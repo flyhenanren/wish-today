@@ -46,8 +46,8 @@ export function useDump() {
 
 export function useThread(){
   const root = "/thread";
-  function queryThreadDetail(query?: ThreadQuery):Promise<Response<ThreadDetail[]>>{
-    return post<ThreadDetail[]>(`${root}/query`, query);
+  function queryThreadDetail(query?: ThreadQuery):Promise<Response<ThreadListResponse>>{
+    return post<ThreadListResponse>(`${root}/query`, query);
   }
 
   function getContent(threadId?: string):Promise<Response<ThreadContent>>{
@@ -69,6 +69,44 @@ export function useTask(){
   return {
     queryProcess
   }
+}
+
+// CallTree API
+export function useCallTree() {
+  const root = "/calltree";
+  function getRoots(fileId: string, page?: number, pageSize?: number): Promise<Response<CallTreeRootsResponse>> {
+    return get<CallTreeRootsResponse>(`${root}/roots/${fileId}`, { page, page_size: pageSize });
+  }
+  function getChildren(parentMethod: string, fileId: string, page?: number, pageSize?: number): Promise<Response<CallTreeChildrenResponse>> {
+    return get<CallTreeChildrenResponse>(`${root}/children/${encodeURIComponent(parentMethod)}`, { file_id: fileId, page, page_size: pageSize });
+  }
+  function getWorkspaceRoots(workspaceId: string, limit?: number): Promise<Response<CallTreeNode[]>> {
+    return get<CallTreeNode[]>(`${root}/workspace/${workspaceId}`, { limit });
+  }
+  function buildCallTree(fileId: string): Promise<Response<string>> {
+    return post<string>(`${root}/build/${fileId}`, {});
+  }
+  function deleteByFile(fileId: string): Promise<Response<void>> {
+    return del<void>(`${root}/file/${fileId}`);
+  }
+  return {
+    getRoots,
+    getChildren,
+    getWorkspaceRoots,
+    buildCallTree,
+    deleteByFile
+  };
+}
+
+// Search API
+export function useSearch() {
+  const root = "/search";
+  function searchMethods(param: SearchQuery): Promise<Response<MethodMatch[]>> {
+    return post<MethodMatch[]>(`${root}/methods`, param);
+  }
+  return {
+    searchMethods
+  };
 }
 
 export interface DumpInfo {
@@ -112,6 +150,8 @@ export type ThreadQuery ={
   file_id?: string
   status?: string
   thread_ids?: string[]
+  page?: number
+  page_size?: number
 }
 
 export interface ThreadDetail{
@@ -130,10 +170,57 @@ export interface ThreadContent{
   content: string[]
 }
 
+export interface ThreadListResponse {
+  threads: ThreadDetail[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
 
 export interface TaskStatus{
   progress: number,
   message: string,
   phase: string
   result: string
+}
+
+// CallTree types
+export interface CallTreeNode {
+  id: string;
+  file_id: string;
+  workspace: string;
+  method_name: string;
+  depth: number;
+  parent_method: string | null;
+  samples: number;
+  is_leaf: boolean;
+  child_count: number;
+}
+
+export interface CallTreeRootsResponse {
+  nodes: CallTreeNode[];
+  total: number;
+  file_id: string;
+}
+
+export interface CallTreeChildrenResponse {
+  nodes: CallTreeNode[];
+  total: number;
+  has_more: boolean;
+}
+
+// Search types
+export interface SearchQuery {
+  workspace_id?: string;
+  query: string;
+  fuzzy?: boolean;
+  max_results?: number;
+}
+
+export interface MethodMatch {
+  method_name: string;
+  total_samples: number;
+  file_count: number;
 }

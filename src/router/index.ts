@@ -15,6 +15,8 @@ import DeadLock from '../components/thread/detail/DeadLock.vue'
 
 import {DumpList, ThreadDetail} from '../components/thread'
 
+import {CallTreeView} from '../components/calltree'
+
 import MemoryView from '../components/memory'
 import SummaryView from '../components/summary'
 import ErrorView from '../view/Error.vue'
@@ -41,6 +43,7 @@ const routes = [
           { path: '/methodsList', name: 'methodsList',  component: MethodsList }
         ]},
       { path: '/thread', name:'thread', component: DumpList,},
+      { path: '/calltree', name:'calltree', component: CallTreeView },
       { path: '/memory', name:'memory',component: MemoryView },
       { path: '/summary', name:'summary',component: SummaryView },
     ]

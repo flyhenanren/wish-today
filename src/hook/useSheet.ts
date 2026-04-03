@@ -8,10 +8,12 @@ export default function() {
     const sheets = reactive<Sheet[]>([])
     const cpuSheet = new CommonSheet('cpu','CPU')
     const threadSheet = new CommonSheet('thread','线程')
+    const calltreeSheet = new CommonSheet('calltree','调用树')
     const summarySheet = new CommonSheet('summary','总结')
     const memorySheet = new CommonSheet('memory','内存')
 
     sheets.push(threadSheet)
+    sheets.push(calltreeSheet)
     sheets.push(cpuSheet)
     sheets.push(memorySheet)
     sheets.push(summarySheet)
